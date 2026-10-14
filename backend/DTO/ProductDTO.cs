@@ -14,3 +14,14 @@ public class ProductDTO
     public bool isActive { get; init; }
     public virtual ICollection<ProductImageDTO>? ProductImages { get; init; }
 }
+
+public record CreateProductRequest(
+    string DisplayId,
+    string Slug,
+    string ProductName,
+    string FkCategoryId,
+    string? Description,
+    decimal BasePrice,
+    string? Material,
+    bool IsActive
+);

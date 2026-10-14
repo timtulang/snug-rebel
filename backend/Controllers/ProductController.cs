@@ -61,19 +61,36 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost("CreateProduct")]
-    public async Task<IActionResult> CreateProduct([FromBody] Product product)
+    public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest request)
     {
-        // PostgreSQL standardizes on UTC for timestamps
-        product.CreatedAt = DateTime.UtcNow;
-        product.UpdatedAt = DateTime.UtcNow;
-        
-        // Ensure new products default to active
-        product.IsActive = true; 
+        var product = new Product
+        {
+            DisplayId = request.DisplayId,
+            Slug = request.Slug,
+            ProductName = request.ProductName,
+            FkCategoryId = request.FkCategoryId,
+            Description = request.Description,
+            BasePrice = request.BasePrice,
+            Material = request.Material,
+            IsActive = request.IsActive,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
 
         _context.Products.Add(product);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetProductById), new { id = product.PkProductId }, product);
+        
+        try
+        {
+            await _context.SaveChangesAsync();
+            
+            return CreatedAtAction(nameof(GetProductById), new { id = product.PkProductId }, product);
+        }
+        catch (DbUpdateException ex)
+        {
+            var dbError = ex.InnerException?.Message ?? ex.Message;
+            
+            return BadRequest(new { Error = "Database save failed", Details = dbError });
+        }
     }
 
     [HttpPut("UpdateProduct/{id}")]
