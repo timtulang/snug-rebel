@@ -2,11 +2,17 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using backend.Data;
 using backend.Models; 
+using Scalar.AspNetCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 builder.Services.AddProblemDetails();   // consistent error shape (from the standards)
+builder.Services.AddHealthChecks();
 builder.Services.AddOpenApi();          // built-in OpenAPI document
 builder.Services.AddAuthorization();
 
@@ -40,7 +46,10 @@ app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
-    app.MapOpenApi();                   // served at /openapi/v1.json
+{
+    app.MapOpenApi();                   // Generates the raw JSON
+    app.MapScalarApiReference();        // Serves the interactive UI
+}    
 else
     app.UseHttpsRedirection();
 
