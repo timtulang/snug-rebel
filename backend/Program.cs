@@ -1,9 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using backend.Data;
+using backend.Models; 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();   // consistent error shape (from the standards)
 builder.Services.AddOpenApi();          // built-in OpenAPI document
-builder.Services.AddHealthChecks();     // /health, used by the smoke test and CD
 builder.Services.AddAuthorization();
 
 // Lets the React dev server (Vite) call the API. Override in appsettings per environment.
@@ -13,9 +17,22 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
         policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod()));
 
-// Later: register your DbContext and services here.
-// builder.Services.AddDbContext<AppDbContext>(...);
-// builder.Services.AddScoped<IUserService, UserService>();
+// Database and Enum Configuration
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+
+dataSourceBuilder.MapEnum<AddressType>("address_type");
+dataSourceBuilder.MapEnum<DiscountType>("discount_type");
+dataSourceBuilder.MapEnum<OrderStatus>("order_status");
+dataSourceBuilder.MapEnum<PaymentMethod>("payment_method");
+dataSourceBuilder.MapEnum<PaymentStatus>("payment_status");
+dataSourceBuilder.MapEnum<ShipmentStatus>("shipment_status");
+dataSourceBuilder.MapEnum<UserRole>("user_role");
+
+var dataSource = dataSourceBuilder.Build();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(dataSource));
 
 var app = builder.Build();
 
@@ -28,12 +45,9 @@ else
     app.UseHttpsRedirection();
 
 app.UseCors();
-// app.UseAuthentication();             // enable once you configure JWT or cookies
 app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 app.MapControllers();
 
 app.Run();
-
-public partial class Program { }        // required so the test project can boot the API
