@@ -24,9 +24,8 @@ export default function RootLayout() {
       {/* the bar is fixed, so push the page down by its height */}
       <main className="pt-(--nav-h)">
         <Outlet />
+        <ScrollRestoration />
       </main>
-
-      <ScrollRestoration />
     </>
   )
 }
