@@ -3,7 +3,7 @@ import landpage_bg from '../assets/landpage_bg.png';
 import left_img from '../assets/left.png';
 import right_img from '../assets/right.png';
 import star_div from '../assets/star_div.svg';
-import Footer from '../components/Footer';
+{/*import Footer from '../components/Footer';*/}
 
 // Button Component
 function ShopButton() {
@@ -135,7 +135,7 @@ export default function LandingPage() {
         
       </section>
       {/* --- FOOTER SECTION --- */}
-      <Footer />
+     {/* <Footer /> */}
         </div>
   );
 }
