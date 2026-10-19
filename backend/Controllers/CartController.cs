@@ -59,6 +59,7 @@ namespace backend.Controllers
             return Ok(MapToCartDto(cart));
         }
 
+        // POST: api/Cart/add
         [HttpPost("add")]
         public async Task<IActionResult> AddToCart([FromBody] AddToCartRequest request)
         {
@@ -67,6 +68,7 @@ namespace backend.Controllers
                 return BadRequest(new { error = "NullRequestBody", message = "Request body cannot be null." });
             }
 
+            // Normalize owner identifiers
             string? normalizedUserId = string.IsNullOrWhiteSpace(request.UserId) ? null : request.UserId;
             string? normalizedSessionToken = string.IsNullOrWhiteSpace(request.SessionToken) ? null : request.SessionToken;
 
@@ -79,24 +81,50 @@ namespace backend.Controllers
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(request.ProductVariantId))
+            // 1. Consolidate single item and batch items into one unified list
+            var itemsToAdd = request.Items ?? new List<CartItemRequest>();
+
+            if (!string.IsNullOrWhiteSpace(request.ProductVariantId))
             {
-                return BadRequest(new { error = "MissingProductVariant", message = "ProductVariantId is required." });
+                itemsToAdd.Add(new CartItemRequest
+                {
+                    ProductVariantId = request.ProductVariantId,
+                    Quantity = request.Quantity ?? 1
+                });
             }
 
-            if (request.Quantity <= 0)
+            // Filter out invalid items
+            var validItems = itemsToAdd
+                .Where(i => i.Quantity > 0 && !string.IsNullOrWhiteSpace(i.ProductVariantId))
+                .ToList();
+
+            if (!validItems.Any())
             {
-                return BadRequest(new { error = "InvalidQuantity", message = "Quantity must be greater than zero." });
+                return BadRequest(new 
+                { 
+                    error = "NoValidItems", 
+                    message = "At least one item with a valid ProductVariantId and quantity > 0 must be provided." 
+                });
             }
 
-            var variantExists = await _context.ProductVariants
-                .AnyAsync(pv => pv.PkProductVariantId == request.ProductVariantId);
+            // 2. Validate existence of all requested product variants in 1 database call
+            var requestedVariantIds = validItems.Select(i => i.ProductVariantId).Distinct().ToList();
+            var existingVariantIds = await _context.ProductVariants
+                .Where(pv => requestedVariantIds.Contains(pv.PkProductVariantId))
+                .Select(pv => pv.PkProductVariantId)
+                .ToListAsync();
 
-            if (!variantExists)
+            var missingVariantIds = requestedVariantIds.Except(existingVariantIds).ToList();
+            if (missingVariantIds.Any())
             {
-                return NotFound(new { error = "ProductVariantNotFound", message = $"Product variant with ID '{request.ProductVariantId}' does not exist." });
+                return NotFound(new 
+                { 
+                    error = "ProductVariantsNotFound", 
+                    message = $"The following ProductVariant IDs do not exist: {string.Join(", ", missingVariantIds)}" 
+                });
             }
 
+            // 3. Detect if cart exists or create a new one
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => 
@@ -107,7 +135,6 @@ namespace backend.Controllers
             {
                 cart = new Cart
                 {
-                    // PkCartId omitted -> PostgreSQL default expression generates it
                     FkUserId = normalizedUserId,
                     SessionToken = normalizedSessionToken,
                     CreatedAt = DateTime.UtcNow,
@@ -120,23 +147,26 @@ namespace backend.Controllers
                 cart.UpdatedAt = DateTime.UtcNow;
             }
 
-            var existingItem = cart.CartItems
-                .FirstOrDefault(ci => ci.FkProductVariantId == request.ProductVariantId);
+            // 4. Upsert items into cart
+            foreach (var item in validItems)
+            {
+                var existingItem = cart.CartItems
+                    .FirstOrDefault(ci => ci.FkProductVariantId == item.ProductVariantId);
 
-            if (existingItem != null)
-            {
-                existingItem.Quantity += request.Quantity;
-            }
-            else
-            {
-                var newItem = new CartItem
+                if (existingItem != null)
                 {
-                    // PkCartItemId omitted -> PostgreSQL default expression generates it
-                    FkProductVariantId = request.ProductVariantId,
-                    Quantity = request.Quantity,
-                    AddedAt = DateTime.UtcNow
-                };
-                cart.CartItems.Add(newItem);
+                    existingItem.Quantity += item.Quantity;
+                }
+                else
+                {
+                    var newItem = new CartItem
+                    {
+                        FkProductVariantId = item.ProductVariantId,
+                        Quantity = item.Quantity,
+                        AddedAt = DateTime.UtcNow
+                    };
+                    cart.CartItems.Add(newItem);
+                }
             }
 
             await _context.SaveChangesAsync();

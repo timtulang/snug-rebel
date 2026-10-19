@@ -9,8 +9,6 @@ public class CartDTO
     public string? FkUserId { get; set; }
     public string? SessionToken { get; set; }
     public List<CartItemDTO> Items { get; set; } = new();
-    
-    // Calculates total count of all items (sum of quantities)
     public int TotalItems => Items?.Sum(i => i.Quantity) ?? 0;
 }
 
@@ -22,12 +20,23 @@ public class CartItemDTO
     public int Quantity { get; set; }
 }
 
+public class CartItemRequest
+{
+    public string ProductVariantId { get; set; } = null!;
+    public int Quantity { get; set; } = 1;
+}
+
 public class AddToCartRequest
 {
     public string? UserId { get; set; }
     public string? SessionToken { get; set; }
-    public string ProductVariantId { get; set; } = null!;
-    public int Quantity { get; set; } = 1;
+    
+    // Single item payload fields
+    public string? ProductVariantId { get; set; }
+    public int? Quantity { get; set; }
+
+    // Multi-item payload list
+    public List<CartItemRequest>? Items { get; set; }
 }
 
 public class UpdateCartItemRequest
