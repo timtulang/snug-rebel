@@ -1,0 +1,74 @@
+/*
+ * NavIconButton states
+ *   inactive : black icon
+ *   hover    : simple drop shadow under the icon
+ *   active   : black circle grows from the centre, icon turns white
+ *   deselect : circle shrinks back to the centre, icon turns black again
+ */
+
+.nav-icon-btn {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 320ms;
+
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--nav-icon-size, 40px);
+  height: var(--nav-icon-size, 40px);
+  border-radius: 50%;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+}
+
+.nav-icon-btn:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+}
+
+/* the black circle: scales from / to its centre */
+.nav-icon-btn__disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #000;
+  transform: scale(0);
+  transition: transform var(--dur) var(--ease);
+}
+
+.nav-icon-btn__icon {
+  position: relative; /* sit above the disc */
+  color: #000;
+  filter: drop-shadow(0 0 0 rgb(0 0 0 / 0.2));
+  /* going back to inactive: wait until the shrinking circle has uncovered the icon */
+  transition:
+    color 160ms ease 120ms,
+    filter 200ms ease;
+}
+
+/* HOVER: simple drop shadow (not while active, it would sit on the black circle) */
+.nav-icon-btn:not([data-active]):hover .nav-icon-btn__icon {
+  filter: drop-shadow(0 3px 2px rgb(0 0 0 / 0.35));
+}
+
+/* ACTIVE */
+.nav-icon-btn[data-active] .nav-icon-btn__disc {
+  transform: scale(1);
+}
+
+.nav-icon-btn[data-active] .nav-icon-btn__icon {
+  color: #fff;
+  /* going to active: flip to white as soon as the growing circle reaches the icon */
+  transition:
+    color 140ms ease 40ms,
+    filter 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-icon-btn__disc,
+  .nav-icon-btn__icon {
+    transition: none;
+  }
+}

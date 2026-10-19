@@ -1,0 +1,106 @@
+/*
+ * NavButton states (text variant)
+ *   inactive : plain text
+ *   hover    : thick underline grows out from the centre
+ *   selected : underline rises into a black box, label turns white,
+ *              and a rough outer stroke appears around it
+ */
+
+.nav-btn {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 360ms;
+  --bar: 6px;              /* underline thickness */
+  --underline-offset: 4px; /* distance from underline to bottom of the button */
+  --inset: 8px;            /* selected box inset = gap + stroke + 1 (see NavButton.tsx) */
+  --tilt: -2.0deg;         /* tilt of the whole stamp when selected */
+}
+
+.nav-btn__label {
+  position: relative;
+  z-index: 1;
+  transition: color 200ms ease 70ms;
+}
+
+/*
+ * Optional element after the label (the SHOP chevron). It is positioned inside
+ * the button's right padding, so showing or hiding it never changes the button's
+ * width: every button keeps the same footprint and the spacing between them
+ * never shifts, whatever is selected.
+ */
+.nav-btn__trailing {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  z-index: 1;
+  display: inline-flex;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+
+.nav-btn__stamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* underline -> black box */
+.nav-btn__fill {
+  position: absolute;
+  background: #000;
+
+  /* INACTIVE: zero-width bar near the bottom edge */
+  top: calc(100% - var(--underline-offset) - var(--bar));
+  bottom: var(--underline-offset);
+  left: 50%;
+  right: 50%;
+  transform: rotate(0deg);
+
+  transition:
+    top var(--dur) var(--ease),
+    bottom var(--dur) var(--ease),
+    left var(--dur) var(--ease),
+    right var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+/* invisible marker the SVG filter turns into the outer stroke */
+.nav-btn__fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #f00;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+/* HOVER / KEYBOARD FOCUS: underline, a little wider than the text */
+.nav-btn:is(:hover, :focus-visible) .nav-btn__fill {
+  left: 16px;
+  right: 16px;
+}
+
+/* SELECTED: must stay AFTER the hover rule so it wins when both apply */
+.nav-btn[data-selected] .nav-btn__fill {
+  top: var(--inset);
+  bottom: var(--inset);
+  left: var(--inset);
+  right: var(--inset);
+  transform: rotate(var(--tilt));
+}
+
+.nav-btn[data-selected] .nav-btn__fill::after {
+  opacity: 1;
+  transition-delay: 80ms;
+}
+
+.nav-btn[data-selected] .nav-btn__label {
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-btn__fill,
+  .nav-btn__fill::after,
+  .nav-btn__label {
+    transition: none;
+  }
+}
