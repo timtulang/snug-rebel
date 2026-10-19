@@ -1,0 +1,99 @@
+.shop-filter-btn {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 160ms;
+  --shadow-offset-x: -5px;
+  --shadow-offset-y: 5px;
+  --tilt-hover: -2deg;
+
+  transform: rotate(0deg);
+  transition: transform var(--dur) var(--ease);
+}
+
+.shop-filter-btn__label {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  text-align: left;
+  white-space: nowrap;
+  transition: color 160ms ease 80ms;
+}
+
+/*
+ * Star icon positioned inside the button's right padding so showing or hiding
+ * it never shifts the button width.
+ */
+
+.shop-filter-btn__trailing {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  z-index: 1;
+  display: inline-flex;
+  translate: 0 -50%;
+  pointer-events: none;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.4) rotate(-45deg);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.shop-filter-btn[data-selected] .shop-filter-btn__trailing {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.shop-filter-btn__stamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* White shadow polygon offset to the bottom-left */
+.shop-filter-btn__shadow {
+  fill: #fff;
+  transform: translate(var(--shadow-offset-x), var(--shadow-offset-y));
+  transition: transform var(--dur) var(--ease);
+}
+
+/* Main polygon fill */
+.shop-filter-btn__fill {
+  fill: #000;
+  stroke: transparent;
+  stroke-width: 2.5px;
+  transition:
+    fill var(--dur) var(--ease),
+    stroke var(--dur) var(--ease);
+}
+
+/* HOVER / KEYBOARD FOCUS: White stroke appears and button tilts */
+.shop-filter-btn:is(:hover, :focus-visible) {
+  transform: rotate(var(--tilt-hover));
+}
+
+.shop-filter-btn:is(:hover, :focus-visible) .shop-filter-btn__fill {
+  stroke: #fff;
+}
+
+.shop-filter-btn:is(:hover, :focus-visible) .shop-filter-btn__shadow {
+  transform: translate(calc(var(--shadow-offset-x) - 1px), calc(var(--shadow-offset-y) + 1px));
+}
+
+/* SELECTED: Turns red, retains white stroke */
+.shop-filter-btn[data-selected] .shop-filter-btn__fill {
+  fill: #990000;
+  stroke: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-filter-btn,
+  .shop-filter-btn__shadow,
+  .shop-filter-btn__fill,
+  .shop-filter-btn__trailing {
+    transition: none;
+  }
+}
