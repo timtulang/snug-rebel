@@ -169,12 +169,13 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("carts");
 
-            entity.HasIndex(e => e.SessionToken, "carts_session_token_key").IsUnique();
+            entity.HasIndex(e => e.SessionToken, "carts_session_token_key");
 
             entity.Property(e => e.PkCartId)
                 .HasMaxLength(40)
                 .HasDefaultValueSql("('cart'::text || (gen_random_uuid())::text)")
-                .HasColumnName("_pk_cart_id");
+                .HasColumnName("_pk_cart_id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")
@@ -207,7 +208,8 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PkCartItemId)
                 .HasMaxLength(40)
                 .HasDefaultValueSql("('c-item'::text || (gen_random_uuid())::text)")
-                .HasColumnName("_pk_cart_item_id");
+                .HasColumnName("_pk_cart_item_id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.AddedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone")

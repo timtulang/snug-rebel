@@ -49,6 +49,7 @@ app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.MapOpenApi();                   // Generates the raw JSON
     app.MapScalarApiReference();        // Serves the interactive UI
 }    
