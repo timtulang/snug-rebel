@@ -46,7 +46,6 @@ export default function ShopFilterButton({
             onClick={handleClick}
             className={[
                 'shop-filter-btn relative inline-flex w-fit cursor-pointer items-center justify-start',
-                // pl-7 left-aligns the text; pr-14 reserves room on the right for the star
                 'bg-transparent pl-7 pr-14 py-3 outline-none',
                 'font-display text-[19px] font-extrabold uppercase leading-none tracking-tight [font-stretch:125%]',
                 className,
@@ -60,12 +59,6 @@ export default function ShopFilterButton({
                 preserveAspectRatio="none"
                 viewBox="0 0 100 100"
             >
-                {/*
-                  Uneven polygon matching reference images:
-                  Top edge slopes slightly up toward the right (4,12 -> 100,4).
-                  Left edge slants outward toward the bottom-left (4,12 -> 0,94).
-                  Bottom edge slopes slightly down toward the right (0,94 -> 100,98).
-                */}
                 <polygon
                     className="shop-filter-btn__shadow"
                     points="4,12 100,4 100,98 0,94"

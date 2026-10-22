@@ -4,7 +4,7 @@
 @theme {
 	--font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
 
-	/* Brand colours used by ItemCardBadge, PillButton and the shop page */
+	/* Colors used by ItemCardBadge, PillButton and the shop page */
 	--color-brand-red: #ff0000;
 	--color-brand-red-dark: #9f0a0a;
 	--color-brand-green: #5fbf6f;

@@ -5,22 +5,14 @@ import PillButton from "./PillButton";
 import { formatCount, formatPrice } from "../helpers/priceFormat";
 
 type ShopItemCardProps = {
-	/** Item display image URL. */
-	imageSrc: string;
-	/** Item name. Also used as the image alt text. */
-	name: string;
-	/** Regular price in pesos. */
-	price: number;
-	/** Sale price. When set (and lower than `price`), the card shows the discount. */
-	salePrice?: number;
-	/** Star rating, e.g. 4.5. */
-	rating: number;
-	/** Number of reviews. */
-	reviewCount: number;
-	/** Number of items sold. */
-	soldCount: number;
-	/** Units left. Shown as a "5 remaining" tag on the image when the badge is "lowStock". */
-	stockLeft?: number;
+	imageSrc: string; // Item display image URL.
+	name: string; // Item name. Also used as the image alt text.
+	price: number; // Regular price in pesos.
+	salePrice?: number; // Sale price. When set (and lower than `price`), the card shows the discount.
+	rating: number; // Star rating, e.g. 4.5.
+	reviewCount: number; // Number of reviews.
+	soldCount: number; // Number of items sold.
+	stockLeft?: number; // Units left. Shown as a "5 remaining" tag on the image when the badge is "lowStock".
 	/**
 	 * Badge on the image. Defaults to "sale" when `salePrice` is set, otherwise "none".
 	 * "outOfStock" also disables the buttons.
@@ -57,12 +49,12 @@ export default function ShopItemCard({
 
 	return (
 		<article className={["group relative w-full", className].join(" ")}>
-			{/* Card background. Starts partway down the image, grows up to wrap it on hover. */}
+			{/* Animated card background */}
 			<div
 				aria-hidden="true"
 				className="absolute inset-x-0 bottom-0 top-14 transition-[top] duration-200 group-hover:-top-3 motion-reduce:transition-none"
 			>
-				{/* Black plate that tilts out from behind the card on hover */}
+				{/* Black back part */}
 				<div className="absolute inset-0 origin-center bg-black opacity-0 transition duration-200 group-hover:rotate-2 group-hover:opacity-100 motion-reduce:transition-none" />
 				<div className="absolute inset-0 bg-white shadow-[0_3px_8px_rgba(0,0,0,0.25)]" />
 			</div>

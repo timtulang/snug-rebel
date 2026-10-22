@@ -39,7 +39,7 @@ export default function Shop() {
 		return [...filtered].sort(SORTERS[sort]);
 	}, [sort, category]);
 
-	// TODO: hook these up to your cart / checkout.
+	// TODO: hook these up to the cart state and checkout flow.
 	const handleBuyNow = (product: Product) =>
 		console.log("buy now", product.id);
 	const handleAddToCart = (product: Product) =>

@@ -13,8 +13,8 @@ type PillButtonProps = ComponentPropsWithoutRef<"button"> & {
 };
 
 /**
- * Pill-shaped button. Sizes to its label by default; stretch it with a className
- * from the parent (e.g. `flex-1` or `w-full`).
+ * Pill-shaped button. Sizes to its label by default.
+ * stretch it with a className from the parent (e.g. `flex-1` or `w-full`).
  */
 export default function PillButton({
 	variant = "black",

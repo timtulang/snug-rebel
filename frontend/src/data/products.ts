@@ -25,7 +25,7 @@ export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
     { value: 'price-desc', label: 'Price, high to low' },
 ]
 
-/** `sidebar: false` keeps a category in the nav dropdown and URL filter, but hides its sidebar button. */
+/** `sidebar: false` keeps a category in the nav dropdown and URL filter, but hides its sidebar button. (mainly for the "best selling" option) */
 export const CATEGORIES: { value: Category; label: string; sidebar?: boolean }[] = [
     { value: 'tops', label: 'Tops' },
     { value: 'bottoms', label: 'Bottoms' },
