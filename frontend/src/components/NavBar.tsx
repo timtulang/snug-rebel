@@ -19,12 +19,8 @@ type NavBarProps = {
   onUtilityChange?: (utility: Utility | null) => void
 }
 
-// Sizes live in index.css (--nav-h, --nav-edge, --nav-logo-h, ...).
-// Spacing between the link buttons is the gap below; it's the same for every pair,
-// whatever is selected, because no button changes width.
 const LINK_GAP = 'gap-8'
 
-/** Slides one piece of the bar up out of view. */
 const slide = (hidden: boolean) =>
   [
     'transition-transform duration-300 ease-out motion-reduce:transition-none',
@@ -37,7 +33,6 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
   const [keyboardFocus, setKeyboardFocus] = useState(false)
   const [activeUtility, setActiveUtility] = useState<Utility | null>(null)
 
-  // keep the bar up while the dropdown is open or someone is tabbing through it
   const hidden = scrolledAway && !shopMenuOpen && !keyboardFocus
 
   const toggleUtility = (utility: Utility) => {
@@ -46,7 +41,6 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
     onUtilityChange?.(next)
   }
 
-  // Escape deselects the active utility icon
   useEffect(() => {
     if (!activeUtility) return
     const onKey = (e: KeyboardEvent) => {
@@ -59,10 +53,8 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
   }, [activeUtility, onUtilityChange])
 
   return (
-    // The header ignores the mouse; each visible piece opts back in with
-    // pointer-events-auto so the empty parts of the bar never block the page.
     <header
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 text-black"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 text-black font-display"
       onFocus={(e) => setKeyboardFocus(e.target.matches(':focus-visible'))}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) setKeyboardFocus(false)
@@ -70,7 +62,6 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
     >
       <RoughFilter />
 
-      {/* white bar background */}
       <div
         aria-hidden="true"
         className={[
@@ -83,7 +74,6 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
         aria-label="Main"
         className="relative grid h-(--nav-h) grid-cols-[1fr_auto_1fr] items-center px-(--nav-edge)"
       >
-        {/* logo (source svg is white, so flatten it to black) */}
         <a
           href="/"
           onClick={(e) => {
@@ -99,7 +89,6 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
           <img src={logo} alt="" className="h-(--nav-logo-h) w-auto brightness-0" draggable={false} />
         </a>
 
-        {/* primary links, generated from NAV_LINKS */}
         <ul className={['pointer-events-auto flex items-center', LINK_GAP, slide(hidden)].join(' ')}>
           {NAV_LINKS.map(({ page: target, label }) => (
             <li key={target}>
@@ -121,7 +110,6 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
           ))}
         </ul>
 
-        {/* utilities: search | cart (stays put) | account */}
         <div className="flex items-center justify-self-end">
           <NavIconButton
             label="Search"
@@ -131,11 +119,6 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
             className={['pointer-events-auto', slide(hidden)].join(' ')}
           />
 
-          {/*
-            The cart never leaves. It sits in a white container as tall as the bar, so it
-            blends into the bar while visible. When the bar hides, the container slides right
-            into the account icon's slot (--cart-dock-x in index.css).
-          */}
           <div
             className={[
               'pointer-events-auto flex size-16 items-center justify-center rounded-full bg-white',
@@ -153,13 +136,40 @@ export default function NavBar({ page, onNavigate, onShopFilter, onUtilityChange
             />
           </div>
 
-          <NavIconButton
-            label="Account"
-            icon={User}
-            active={activeUtility === 'account'}
-            onClick={() => toggleUtility('account')}
-            className={['pointer-events-auto', slide(hidden)].join(' ')}
-          />
+          <div className={['pointer-events-auto relative', slide(hidden)].join(' ')}>
+            <NavIconButton
+              label="Account"
+              icon={User}
+              active={activeUtility === 'account'}
+              onClick={() => toggleUtility('account')}
+            />
+
+            {activeUtility === 'account' && (
+              <div className="absolute right-0 top-full mt-2 w-48 flex flex-col bg-white border-[4px] border-black z-50 py-4 origin-top-right animate-in fade-in zoom-in duration-200 ease-out">
+                <button 
+                  onClick={() => {
+                    toggleUtility('account');
+                    // Route to Log In
+                    onNavigate('login' as Page);
+                  }}
+                  className="px-6 py-4 text-left text-sm font-extrabold uppercase tracking-widest text-black hover:text-[#e60000] transition-colors focus:outline-none focus:text-[#e60000]"
+                >
+                  Log In
+                </button>
+                <button 
+                  onClick={() => {
+                    toggleUtility('account');
+                    // Route to Sign Up
+                    onNavigate('signup' as Page);
+                  }}
+                  className="px-6 py-4 text-left text-sm font-extrabold uppercase tracking-widest text-black hover:text-[#e60000] transition-colors focus:outline-none focus:text-[#e60000]"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
+          </div>
+
         </div>
       </nav>
     </header>
