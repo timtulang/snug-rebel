@@ -120,14 +120,15 @@ export default function LandingPage() {
           />
         </div>
 
+        {/* Center Star Graphic */}
         <img 
           src={star_div} 
           alt="Decorative Stars" 
           className="
             absolute left-1/2 top-1/2 
             transform -translate-x-1/2 -translate-y-1/2 
-            z-30 w-48 md:w-80 lg:w-96 
-            pointer-events-none drop-shadow-2xl
+            z-30 h-[90vh] md:h-full w-auto 
+            object-contain pointer-events-none drop-shadow-2xl
           " 
         />
         
