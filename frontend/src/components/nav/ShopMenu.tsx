@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { CATEGORIES } from "../data/products.ts";
+import { CATEGORIES } from "../../data/products.ts";
 import NavButton from "./NavButton.tsx";
 
 const itemClass =

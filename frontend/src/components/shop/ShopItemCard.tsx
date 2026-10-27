@@ -1,18 +1,27 @@
 import { Star } from "lucide-react";
+import { Link } from "react-router";
 import AddToCartButton from "./AddToCartButton";
 import ItemCardBadge, { type ItemBadgeVariant } from "./ItemCardBadge";
-import PillButton from "./PillButton";
-import { formatCount, formatPrice } from "../helpers/priceFormat";
+import PillButton from "../ui/PillButton";
+import { formatCount, formatPrice } from "../../helpers/priceFormat";
 
 type ShopItemCardProps = {
-	imageSrc: string; // Item display image URL.
-	name: string; // Item name. Also used as the image alt text.
-	price: number; // Regular price in pesos.
-	salePrice?: number; // Sale price. When set (and lower than `price`), the card shows the discount.
-	rating: number; // Star rating, e.g. 4.5.
-	reviewCount: number; // Number of reviews.
-	soldCount: number; // Number of items sold.
-	stockLeft?: number; // Units left. Shown as a "5 remaining" tag on the image when the badge is "lowStock".
+	/** Item display image URL. */
+	imageSrc: string;
+	/** Item name. Also used as the image alt text. */
+	name: string;
+	/** Regular price in pesos. */
+	price: number;
+	/** Sale price. When set (and lower than `price`), the card shows the discount. */
+	salePrice?: number;
+	/** Star rating, e.g. 4.5. */
+	rating: number;
+	/** Number of reviews. */
+	reviewCount: number;
+	/** Number of items sold. */
+	soldCount: number;
+	/** Units left. Shown as a "5 remaining" tag on the image when the badge is "lowStock". */
+	stockLeft?: number;
 	/**
 	 * Badge on the image. Defaults to "sale" when `salePrice` is set, otherwise "none".
 	 * "outOfStock" also disables the buttons.
@@ -20,6 +29,8 @@ type ShopItemCardProps = {
 	badge?: ItemBadgeVariant;
 	onBuyNow?: () => void;
 	onAddToCart?: () => void;
+	/** Item page URL. When set, the image and the name link to it. */
+	href?: string;
 	/** Sizing/positioning from the parent, e.g. "w-52". The card fills its container by default. */
 	className?: string;
 };
@@ -36,6 +47,7 @@ export default function ShopItemCard({
 	badge,
 	onBuyNow,
 	onAddToCart,
+	href,
 	className = "",
 }: ShopItemCardProps) {
 	const isOnSale = salePrice !== undefined && salePrice < price;
@@ -49,12 +61,12 @@ export default function ShopItemCard({
 
 	return (
 		<article className={["group relative w-full", className].join(" ")}>
-			{/* Animated card background */}
+			{/* Card background. Starts partway down the image, grows up to wrap it on hover. */}
 			<div
 				aria-hidden="true"
 				className="absolute inset-x-0 bottom-0 top-14 transition-[top] duration-200 group-hover:-top-3 motion-reduce:transition-none"
 			>
-				{/* Black back part */}
+				{/* Black plate that tilts out from behind the card on hover */}
 				<div className="absolute inset-0 origin-center bg-black opacity-0 transition duration-200 group-hover:rotate-2 group-hover:opacity-100 motion-reduce:transition-none" />
 				<div className="absolute inset-0 bg-white shadow-[0_3px_8px_rgba(0,0,0,0.25)]" />
 			</div>
@@ -82,6 +94,14 @@ export default function ShopItemCard({
 							</span>
 						)
 					)}
+					{href && (
+						<Link
+							to={href}
+							aria-label={`View ${name}`}
+							tabIndex={-1}
+							className="absolute inset-0"
+						/>
+					)}
 				</div>
 
 				<div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-0.5">
@@ -89,7 +109,16 @@ export default function ShopItemCard({
 						className="truncate font-display text-[13px] font-extrabold tracking-tight [font-stretch:125%]"
 						title={name}
 					>
-						{name}
+						{href ? (
+							<Link
+								to={href}
+								className="hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+							>
+								{name}
+							</Link>
+						) : (
+							name
+						)}
 					</h3>
 					{isOnSale ? (
 						<s className="text-right font-display text-[11px] font-extrabold tracking-tight [font-stretch:125%]">

@@ -1,0 +1,8 @@
+<svg width="384" height="104" viewBox="0 0 384 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.5 70.5L0 30.5L43.5 47L61 33L80 41.5L83 15.5L357 0L367.5 96L383.5 104L367.5 102L103.5 70L86 79L61 57.5L42.5 70.5Z" fill="black"/>
+<path d="M42.5 66.5L9 36L44 51.5L61 36L82 46L86 18.5L353.5 5L363 96.5L102.5 66.5L86 75L61 53.5L42.5 66.5Z" fill="black"/>
+<mask id="stroke0_336_1164" fill="white">
+<path d="M42.5 66.5L9 36L44 51.5L61 36L82 46L86 18.5L353.5 5L363 96.5L102.5 66.5L86 75L61 53.5L42.5 66.5Z"/>
+</mask>
+<path d="M9 36L42.5 66.5L61 53.5L86 75L102.5 66.5L363 96.5L353.5 5L86 18.5L82 46L61 36L44 51.5L9 36Z" stroke-width="4" stroke="white" mask="url(#stroke0_336_1164)"/>
+</svg>

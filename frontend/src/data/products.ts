@@ -1,4 +1,4 @@
-import type { ItemBadgeVariant } from '../components/ItemCardBadge'
+import type { ItemBadgeVariant } from '../components/shop/ItemCardBadge'
 
 export type Category = 'tops' | 'bottoms' | 'outerwear' | 'best-selling' | 'accessories'
 export type SortKey = 'best-selling' | 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc'

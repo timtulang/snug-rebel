@@ -1,5 +1,5 @@
 import { useState, type ComponentPropsWithoutRef, type ReactNode, type MouseEvent } from 'react'
-import '../styles/ShopFilterButton.css'
+import '../../styles/ShopFilterButton.css'
 
 type ShopFilterButtonProps = Omit<ComponentPropsWithoutRef<'button'>, 'children'> & {
     label?: string // text to display in the button (matches NavButton convention)

@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
-import categoryHeader from "../assets/shoppingpage_category_filter_header.svg";
-import sortHeader from "../assets/shoppingpage_sort_filter_header.svg";
-import starBg from "../assets/snugrebel_star_bg.png";
+import categoryHeader from "../../assets/shoppingpage_category_filter_header.svg";
+import sortHeader from "../../assets/shoppingpage_sort_filter_header.svg";
+import starBg from "../../assets/snugrebel_star_bg.png";
 import ShopFilterButton from "./ShopFilterButton";
 import {
 	CATEGORIES,
 	SORT_OPTIONS,
 	type Category,
 	type SortKey,
-} from "../data/products";
+} from "../../data/products";
 
 type ShopSidebarProps = {
 	sort: SortKey;

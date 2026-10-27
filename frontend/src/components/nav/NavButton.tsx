@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react'
-import '../styles/NavButton.css'
+import '../../styles/NavButton.css'
 
 export const ROUGH_FILTER_ID = 'button-rough-edge'
 

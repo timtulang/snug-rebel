@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import PillButton from "../components/PillButton";
-import ShopItemCard from "../components/ShopItemCard";
-import ShopSidebar from "../components/ShopSidebar";
+import PillButton from "../components/ui/PillButton";
+import ShopItemCard from "../components/shop/ShopItemCard";
+import ShopSidebar from "../components/shop/ShopSidebar";
+import { itemPath } from "../routes";
 import {
 	CATEGORIES,
 	PRODUCTS,
@@ -39,7 +40,7 @@ export default function Shop() {
 		return [...filtered].sort(SORTERS[sort]);
 	}, [sort, category]);
 
-	// TODO: hook these up to the cart state and checkout flow.
+	// TODO: hook these up to your cart / checkout.
 	const handleBuyNow = (product: Product) =>
 		console.log("buy now", product.id);
 	const handleAddToCart = (product: Product) =>
@@ -57,7 +58,7 @@ export default function Shop() {
 
 				<section
 					aria-label="Products"
-					className="bg-gray-200 px-6 pb-16 pt-8 md:px-10"
+					className="bg-neutral-200 px-6 pb-16 pt-8 md:px-10"
 				>
 					{products.length > 0 ? (
 						<ul className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-x-6 gap-y-6">
@@ -77,6 +78,7 @@ export default function Shop() {
 										onAddToCart={() =>
 											handleAddToCart(product)
 										}
+										href={itemPath(product.id)}
 									/>
 								</li>
 							))}

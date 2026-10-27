@@ -1,6 +1,6 @@
 import type { ComponentPropsWithoutRef } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import '../styles/NavIconButton.css'
+import '../../styles/NavIconButton.css'
 
 type NavIconButtonProps = Omit<ComponentPropsWithoutRef<'button'>, 'children'> & {
     label: string // accessible name (icon buttons have no visible text)
