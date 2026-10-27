@@ -2,7 +2,7 @@ export const ROUTES = {
   home: '/',
   shop: '/shop',
   about: '/about',
-  orders: '/orders',
+  tracking: '/tracking'
 } as const
 
 export type Page = keyof typeof ROUTES
@@ -12,7 +12,7 @@ export const NAV_LINKS: { page: Page; label: string }[] = [
   { page: 'home', label: 'Home' },
   { page: 'shop', label: 'Shop' },
   { page: 'about', label: 'About' },
-  { page: 'orders', label: 'Orders' },
+  { page: 'tracking', label: 'Tracking' }
 ]
 
 /** Which nav page a URL belongs to (so /shop/tops still highlights Shop). null = none. */
