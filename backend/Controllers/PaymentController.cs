@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
+using backend.DTO;
 using backend.Models;
 
 namespace backend.Controllers;
@@ -75,12 +76,4 @@ public class PaymentController : ControllerBase
             return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
         }
     }
-}
-
-// Request DTO (can be moved to your DTO folder)
-public class ProcessPaymentRequest
-{
-    public string OrderId { get; set; } = null!;
-    public PaymentMethod Method { get; set; } // gcash, maya, card, etc.
-    public string? ProviderReference { get; set; } // ID returned from Stripe/PayMongo
 }
