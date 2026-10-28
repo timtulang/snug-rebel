@@ -17,7 +17,7 @@ public class ProductController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("GetProducts")]
+    [HttpGet]
     public async Task<IActionResult> GetProducts()
     {
         try
@@ -32,8 +32,11 @@ public class ProductController : ControllerBase
         }
     }
 
+    [HttpGet("GetProducts")]
+    public Task<IActionResult> GetProductsLegacy() => GetProducts();
+
     [HttpGet("ProductList")]
-    public async Task<IActionResult> ProductList()
+    public async Task<IActionResult> GetProductList()
     {
         try
         {
@@ -60,7 +63,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpGet("GetProductByID/{id}")]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById(string id)
     {
         try
@@ -99,7 +102,10 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpPost("CreateProduct")]
+    [HttpGet("GetProductByID/{id}")]
+    public Task<IActionResult> GetProductByIdLegacy(string id) => GetProductById(id);
+
+    [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest request)
     {
         try
@@ -135,7 +141,10 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpPut("UpdateProduct/{id}")]
+    [HttpPost("CreateProduct")]
+    public Task<IActionResult> CreateProductLegacy([FromBody] CreateProductRequest request) => CreateProduct(request);
+
+    [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProduct(string id, [FromBody] Product updatedProduct)
     {
         try
@@ -171,7 +180,10 @@ public class ProductController : ControllerBase
         }
     }
 
-    [HttpDelete("DeactivateProduct/{id}")]
+    [HttpPut("UpdateProduct/{id}")]
+    public Task<IActionResult> UpdateProductLegacy(string id, [FromBody] Product updatedProduct) => UpdateProduct(id, updatedProduct);
+
+    [HttpDelete("{id}/deactivate")]
     public async Task<IActionResult> DeactivateProduct(string id)
     {
         try
@@ -191,4 +203,7 @@ public class ProductController : ControllerBase
             return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
         }
     }
+
+    [HttpDelete("DeactivateProduct/{id}")]
+    public Task<IActionResult> DeactivateProductLegacy(string id) => DeactivateProduct(id);
 }

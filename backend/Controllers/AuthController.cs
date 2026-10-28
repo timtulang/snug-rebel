@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
+using backend.DTO;
 using backend.Models;
 using BCrypt.Net;
 
@@ -87,20 +88,4 @@ public class AuthController : ControllerBase
             return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
         }
     }
-}
-
-// Request DTOs (can be moved to your DTO folder)
-public class RegisterRequest
-{
-    public string Email { get; set; } = null!;
-    public string Password { get; set; } = null!;
-    public string FirstName { get; set; } = null!;
-    public string LastName { get; set; } = null!;
-    public string PhoneNumber { get; set; } = null!;
-}
-
-public class LoginRequest
-{
-    public string Email { get; set; } = null!;
-    public string Password { get; set; } = null!;
 }
