@@ -38,27 +38,25 @@ public class ProductController : ControllerBase
         try
         {
             var products = await _context.Products
-                .Select(p => new ProductDTO
+                .Where(p => p.IsActive)
+                .Select(p => new ProductListDTO
                 {
-                    PkProductId = p.PkProductId,
-                    DisplayId = p.DisplayId,
-                    Slug = p.Slug,
-                    ProductName = p.ProductName,
-                    FkCategoryId = p.FkCategoryId,
-                    BasePrice = p.BasePrice.ToString("F2"),
-                    isActive = p.IsActive,
-                    ProductImages = p.ProductImages
+                    Id = p.PkProductId,
+                    Name = p.ProductName ?? string.Empty,
+                    Price = p.BasePrice,
+                    ImageSrc = p.ProductImages
                         .Where(img => img.IsPrimary)
-                        .Select(img => new ProductImageDTO { Url = img.Url, AltText = img.AltText })
-                        .ToList()
+                        .Select(img => img.Url)
+                        .FirstOrDefault() ?? "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='400' height='400' fill='%237a7a7a'/></svg>",
+                    Categories = p.FkCategoryId != null ? new List<string> { p.FkCategoryId } : new List<string>()
                 })
-            .ToListAsync();
+                .ToListAsync();
+
             return Ok(products);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"=== PRODUCT LIST CRASH ===\n{ex}");
-            return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
+            return StatusCode(500, new { error = "InternalServerError", message = ex.Message });
         }
     }
 
@@ -67,14 +65,37 @@ public class ProductController : ControllerBase
     {
         try
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products
+                .Include(p => p.ProductImages)
+                .FirstOrDefaultAsync(p => p.PkProductId == id);
+
             if (product == null) return NotFound();
-            return Ok(product);
+
+            var detail = new ProductDetailDTO
+            {
+                Id = product.PkProductId,
+                Name = product.ProductName ?? string.Empty,
+                Description = product.Description ?? string.Empty,
+                Price = product.BasePrice,
+                ImageSrc = product.ProductImages?.FirstOrDefault(img => img.IsPrimary)?.Url 
+                           ?? product.ProductImages?.FirstOrDefault()?.Url 
+                           ?? "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='710' height='981'><rect width='710' height='981' fill='%237a7a7a'/></svg>",
+                Stock = 10,
+                Colors = new List<ColorDTO>
+                {
+                    new("Standard", "#000000")
+                },
+                Sizes = new List<SizeDTO>
+                {
+                    new("S", true), new("M", true), new("L", true), new("XL", true)
+                }
+            };
+
+            return Ok(detail);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"=== GET PRODUCT BY ID CRASH ===\n{ex}");
-            return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
+            return StatusCode(500, new { error = "InternalServerError", message = ex.Message });
         }
     }
 
