@@ -20,115 +20,154 @@ public class ProductController : ControllerBase
     [HttpGet("GetProducts")]
     public async Task<IActionResult> GetProducts()
     {
-        var products = await _context.Products.ToListAsync();
-        return Ok(products);
+        try
+        {
+            var products = await _context.Products.ToListAsync();
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"=== GET PRODUCTS CRASH ===\n{ex}");
+            return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
+        }
     }
 
     [HttpGet("ProductList")]
     public async Task<IActionResult> ProductList()
     {
-        var products = await _context.Products
-            .Select(p => new ProductDTO
-            {
-                PkProductId = p.PkProductId,
-                DisplayId = p.DisplayId,
-                Slug = p.Slug,
-                ProductName = p.ProductName,
-                FkCategoryId = p.FkCategoryId,
-                BasePrice = p.BasePrice.ToString("F2"), // Format as string with 2 decimal places
-                isActive = p.IsActive,
-                ProductImages = p.ProductImages
-                    .Where(img => img.IsPrimary) // Only include primary images
-                    .Select(img => new ProductImageDTO
-                    {
-                        Url = img.Url,
-                        AltText = img.AltText
-                    })
-                    .ToList()
-            })
-        .ToListAsync();
-        return Ok(products);
+        try
+        {
+            var products = await _context.Products
+                .Select(p => new ProductDTO
+                {
+                    PkProductId = p.PkProductId,
+                    DisplayId = p.DisplayId,
+                    Slug = p.Slug,
+                    ProductName = p.ProductName,
+                    FkCategoryId = p.FkCategoryId,
+                    BasePrice = p.BasePrice.ToString("F2"),
+                    isActive = p.IsActive,
+                    ProductImages = p.ProductImages
+                        .Where(img => img.IsPrimary)
+                        .Select(img => new ProductImageDTO { Url = img.Url, AltText = img.AltText })
+                        .ToList()
+                })
+            .ToListAsync();
+            return Ok(products);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"=== PRODUCT LIST CRASH ===\n{ex}");
+            return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
+        }
     }
 
     [HttpGet("GetProductByID/{id}")]
     public async Task<IActionResult> GetProductById(string id)
     {
-        var product = await _context.Products.FindAsync(id);
-        
-        if (product == null) return NotFound();
-        
-        return Ok(product);
+        try
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+            return Ok(product);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"=== GET PRODUCT BY ID CRASH ===\n{ex}");
+            return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
+        }
     }
 
     [HttpPost("CreateProduct")]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest request)
     {
-        var product = new Product
-        {
-            DisplayId = request.DisplayId,
-            Slug = request.Slug,
-            ProductName = request.ProductName,
-            FkCategoryId = request.FkCategoryId,
-            Description = request.Description,
-            BasePrice = request.BasePrice,
-            Material = request.Material,
-            IsActive = request.IsActive,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        _context.Products.Add(product);
-        
         try
         {
+            var product = new Product
+            {
+                DisplayId = request.DisplayId,
+                Slug = request.Slug,
+                ProductName = request.ProductName,
+                FkCategoryId = request.FkCategoryId,
+                Description = request.Description,
+                BasePrice = request.BasePrice,
+                Material = request.Material,
+                IsActive = request.IsActive,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.Products.Add(product);
             await _context.SaveChangesAsync();
-            
             return CreatedAtAction(nameof(GetProductById), new { id = product.PkProductId }, product);
         }
-        catch (DbUpdateException ex)
+        catch (DbUpdateException dbEx)
         {
-            var dbError = ex.InnerException?.Message ?? ex.Message;
-            
-            return BadRequest(new { Error = "Database save failed", Details = dbError });
+            var dbError = dbEx.InnerException?.Message ?? dbEx.Message;
+            Console.WriteLine($"=== CREATE PRODUCT DB CRASH ===\n{dbEx}");
+            return StatusCode(500, new { error = "DatabaseUpdateFailed", details = dbError, stackTrace = dbEx.ToString() });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"=== CREATE PRODUCT CRASH ===\n{ex}");
+            return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
         }
     }
 
     [HttpPut("UpdateProduct/{id}")]
     public async Task<IActionResult> UpdateProduct(string id, [FromBody] Product updatedProduct)
     {
-        if (id != updatedProduct.PkProductId) return BadRequest("Product ID mismatch.");
+        try
+        {
+            if (id != updatedProduct.PkProductId) return BadRequest("Product ID mismatch.");
 
-        var existingProduct = await _context.Products.FindAsync(id);
-        if (existingProduct == null) return NotFound();
+            var existingProduct = await _context.Products.FindAsync(id);
+            if (existingProduct == null) return NotFound();
 
-        existingProduct.DisplayId = updatedProduct.DisplayId;
-        existingProduct.Slug = updatedProduct.Slug;
-        existingProduct.ProductName = updatedProduct.ProductName;
-        existingProduct.FkCategoryId = updatedProduct.FkCategoryId;
-        existingProduct.Description = updatedProduct.Description;
-        existingProduct.BasePrice = updatedProduct.BasePrice;
-        existingProduct.Material = updatedProduct.Material;
-        existingProduct.IsActive = updatedProduct.IsActive;
-        
-        existingProduct.UpdatedAt = DateTime.UtcNow;
+            existingProduct.DisplayId = updatedProduct.DisplayId;
+            existingProduct.Slug = updatedProduct.Slug;
+            existingProduct.ProductName = updatedProduct.ProductName;
+            existingProduct.FkCategoryId = updatedProduct.FkCategoryId;
+            existingProduct.Description = updatedProduct.Description;
+            existingProduct.BasePrice = updatedProduct.BasePrice;
+            existingProduct.Material = updatedProduct.Material;
+            existingProduct.IsActive = updatedProduct.IsActive;
+            existingProduct.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (DbUpdateException dbEx)
+        {
+            var dbError = dbEx.InnerException?.Message ?? dbEx.Message;
+            Console.WriteLine($"=== UPDATE PRODUCT DB CRASH ===\n{dbEx}");
+            return StatusCode(500, new { error = "DatabaseUpdateFailed", details = dbError, stackTrace = dbEx.ToString() });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"=== UPDATE PRODUCT CRASH ===\n{ex}");
+            return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
+        }
     }
 
-    // Handles the DELETE HTTP verb, but performs a soft delete
     [HttpDelete("DeactivateProduct/{id}")]
     public async Task<IActionResult> DeactivateProduct(string id)
     {
-        var product = await _context.Products.FindAsync(id);
-        if (product == null) return NotFound();
+        try
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound();
 
-        product.IsActive = false;
-        product.UpdatedAt = DateTime.UtcNow;
+            product.IsActive = false;
+            product.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"=== DEACTIVATE PRODUCT CRASH ===\n{ex}");
+            return StatusCode(500, new { error = "InternalServerError", message = ex.Message, stackTrace = ex.ToString() });
+        }
     }
 }
