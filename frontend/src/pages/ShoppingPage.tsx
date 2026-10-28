@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import PillButton from "../components/ui/PillButton";
 import ShopItemCard from "../components/shop/ShopItemCard";
@@ -6,7 +6,7 @@ import ShopSidebar from "../components/shop/ShopSidebar";
 import { itemPath } from "../routes";
 import {
 	CATEGORIES,
-	PRODUCTS,
+	getProducts,
 	type Category,
 	type Product,
 	type SortKey,
@@ -23,6 +23,19 @@ const SORTERS: Record<SortKey, (a: Product, b: Product) => number> = {
 };
 
 export default function Shop() {
+	const [productsData, setProductsData] = useState<Product[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+    getProducts()
+        .then(setProductsData)
+        .catch((err) => {
+            setError(err instanceof Error ? err.message : "Failed to load products");
+        })
+        .finally(() => setLoading(false));
+}, []);
+
 	const [sort, setSort] = useState<SortKey>("best-selling");
 
 	// The category lives in the URL (/shop?filter=tops) so the nav dropdown can link straight to it.
@@ -35,10 +48,11 @@ export default function Shop() {
 
 	const products = useMemo(() => {
 		const filtered = category
-			? PRODUCTS.filter((p) => p.categories.includes(category))
-			: PRODUCTS;
+			? productsData.filter((p) => p.categories.includes(category))
+			: productsData;
+
 		return [...filtered].sort(SORTERS[sort]);
-	}, [sort, category]);
+	}, [productsData, sort, category]);
 
 	// TODO: hook these up to your cart / checkout.
 	const handleBuyNow = (product: Product) =>
@@ -60,7 +74,16 @@ export default function Shop() {
 					aria-label="Products"
 					className="bg-neutral-200 px-6 pb-16 pt-8 md:px-10"
 				>
-					{products.length > 0 ? (
+					{loading ? (
+						<p>Loading products...</p>
+					) : error ? (
+						<div className="flex flex-col items-start gap-4 pt-16">
+							<p>Failed to load products: {error}</p>
+							<PillButton onClick={() => window.location.reload()}>
+								Try again
+							</PillButton>
+						</div>
+					) : products.length > 0 ? (
 						<ul className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-x-6 gap-y-6">
 							{products.map((product) => (
 								<li key={product.id}>

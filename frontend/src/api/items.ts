@@ -1,4 +1,4 @@
-import { PRODUCTS } from '../data/products'
+import { apiFetch } from "../api/api";
 
 /*
  * Data layer for the item page.
@@ -143,24 +143,23 @@ const simulateNetwork = () => new Promise((resolve) => setTimeout(resolve, 150))
 // ---------------------------------------------------------------------------------------------
 
 /** One item by id. Resolves to null when it doesn't exist. */
-export async function getItem(id: string): Promise<ItemDetail | null> {
-    await simulateNetwork()
-
-    // Mock only: build a detail page from the shop grid's products so every card has somewhere to go.
-    const product = PRODUCTS.find((p) => p.id === id)
-    if (!product) return null
-    return {
-        ...DEFAULT_DETAILS,
-        id: product.id,
-        name: product.name,
-        imageSrc: PLACEHOLDER_IMAGE,
-        price: product.price,
-        salePrice: product.salePrice,
-        rating: product.rating,
-        reviewCount: product.reviewCount,
-        soldCount: product.soldCount,
-        stock: product.stockLeft ?? 24,
+export async function getItem(
+  id: string
+): Promise<ItemDetail | null> {
+  try {
+    return await apiFetch<ItemDetail>(
+      `/Product/GetProductByID/${encodeURIComponent(id)}`
+    );
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.includes("404")
+    ) {
+      return null;
     }
+
+    throw error;
+  }
 }
 
 /** Reviews for one item, newest last (the page shows them in the order returned). */
