@@ -15,6 +15,12 @@ export const NAV_LINKS: { page: Page; label: string }[] = [
   { page: 'orders', label: 'Orders' },
 ]
 
+/** Router path pattern for the item page (relative to the root layout). */
+export const ITEM_ROUTE_PATTERN = 'shop/:itemId'
+
+/** Link to one item's page, e.g. itemPath('p2') -> "/shop/p2". */
+export const itemPath = (itemId: string) => `${ROUTES.shop}/${encodeURIComponent(itemId)}`
+
 /** Which nav page a URL belongs to (so /shop/tops still highlights Shop). null = none. */
 export function pageFromPath(pathname: string): Page | null {
   const pages = Object.keys(ROUTES) as Page[]

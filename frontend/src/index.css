@@ -1,31 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap");
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+	--font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+
+	/* Colors used by ItemCardBadge, PillButton and the shop page */
+	--color-brand-red: #ff0000;
+	--color-brand-red-dark: #9f0a0a;
+	--color-brand-green: #5fbf6f;
+	--color-brand-orange: #f79103;
 }
 
 /*
  * Layout tokens for the navigation bar and the pages that sit under it.
  * Change a value here and everything that uses it follows.
  */
- 
+
 :root {
-  --nav-h: 84px;            /* bar thickness */
-  --nav-edge: 16px;         /* viewport edge -> logo / icons */
-  --nav-logo-h: 64px;       /* logo height */
-  --nav-icon-size: 40px;    /* icon button size */
+	--nav-h: 84px; /* bar thickness */
+	--nav-edge: 16px; /* viewport edge -> logo / icons */
+	--nav-logo-h: 64px; /* logo height */
+	--nav-icon-size: 40px; /* icon button size */
 
-  /* how far each piece of the bar slides up to leave the screen */
-  --nav-hide-shift: calc(-1 * (var(--nav-h) + 28px));
+	/* how far each piece of the bar slides up to leave the screen */
+	--nav-hide-shift: calc(-1 * (var(--nav-h) + 28px));
 
-  /* how far the cart container slides right when the bar hides (= the account icon's width).
+	/* how far the cart container slides right when the bar hides (= the account icon's width).
      For a container flush with the screen edge use: calc(var(--nav-icon-size) + var(--nav-edge)) */
-  --cart-dock-x: var(--nav-icon-size);
+	--cart-dock-x: var(--nav-icon-size);
 }
 
 @media (min-width: 768px) {
-  :root {
-    --nav-edge: 32px;
-  }
+	:root {
+		--nav-edge: 32px;
+	}
 }

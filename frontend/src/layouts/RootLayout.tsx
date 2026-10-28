@@ -1,5 +1,5 @@
 import { createSearchParams, Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router'
-import NavBar from '../components/NavBar.tsx'
+import NavBar from '../components/nav/NavBar.tsx'
 import { pageFromPath, ROUTES } from '../routes.ts'
 
 /** Wraps every page: the nav bar on top, the current page below it. Connects the nav to the router. */
