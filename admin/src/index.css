@@ -1,17 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap");
+
 :root {
-  --page-bg: #f4f1ea;
-  --panel: rgba(255, 255, 255, 0.85);
-  --panel-alt: #f8f5f1;
-  --border: rgba(20, 20, 24, 0.08);
-  --text-strong: #17171a;
-  --muted: #5e6472;
-  --accent-soft: rgba(31, 41, 55, 0.05);
-  --primary: #1f2937;
-  --primary-strong: #111827;
-  --shadow-soft: 0 12px 30px rgba(17, 17, 20, 0.06);
+  --page-bg: #edf6ef;
+  --content-bg: #e3efe8;
+  --panel: rgba(255, 255, 255, 0.82);
+  --panel-alt: #f4faf5;
+  --card-bg: rgba(255, 255, 255, 0.28);
+  --input-bg: rgba(255, 255, 255, 0.74);
+  --border: rgba(16, 42, 27, 0.1);
+  --text-strong: #142219;
+  --muted: #53695a;
+  --accent: #2d8f5b;
+  --accent-soft: rgba(45, 143, 91, 0.12);
+  --primary: #123724;
+  --primary-strong: #081c12;
+  --sidebar-bg-start: #163b2a;
+  --sidebar-bg-end: #0d221a;
+  --sidebar-text: #edf8f1;
+  --sidebar-badge-bg: rgba(255,255,255,0.08);
+  --sidebar-badge-border: rgba(255,255,255,0.12);
+  --shadow-soft: 0 18px 36px rgba(13, 34, 26, 0.12);
   color: var(--text-strong);
   background: var(--page-bg);
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-family: 'Archivo', 'Inter', 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 500;
   font-synthesis: none;
@@ -21,16 +32,25 @@
 }
 
 :root[data-theme='dark'] {
-  --page-bg: #12161c;
-  --panel: rgba(18, 22, 28, 0.94);
-  --panel-alt: rgba(23, 30, 38, 0.96);
-  --border: rgba(148, 163, 184, 0.12);
-  --text-strong: #edf2f7;
-  --muted: #a1acba;
-  --accent-soft: rgba(255, 255, 255, 0.04);
-  --primary: #dfe7f2;
-  --primary-strong: #f8fafc;
-  --shadow-soft: 0 18px 38px rgba(0, 0, 0, 0.2);
+  --page-bg: #091710;
+  --content-bg: #102218;
+  --panel: rgba(16, 30, 24, 0.96);
+  --panel-alt: rgba(22, 39, 31, 0.98);
+  --card-bg: rgba(17, 27, 22, 0.98);
+  --input-bg: rgba(10, 17, 13, 0.92);
+  --border: rgba(160, 220, 182, 0.12);
+  --text-strong: #edf8f0;
+  --muted: #a9c4b1;
+  --accent: #69d090;
+  --accent-soft: rgba(105, 208, 144, 0.14);
+  --primary: #edf8f0;
+  --primary-strong: #ffffff;
+  --sidebar-bg-start: #163b2a;
+  --sidebar-bg-end: #0d221a;
+  --sidebar-text: #edf8f1;
+  --sidebar-badge-bg: rgba(255,255,255,0.06);
+  --sidebar-badge-border: rgba(255,255,255,0.1);
+  --shadow-soft: 0 20px 42px rgba(0, 0, 0, 0.42);
 }
 
 * {
@@ -47,6 +67,7 @@ body {
   min-height: 100vh;
   background: var(--page-bg);
   color: var(--text-strong);
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 button,

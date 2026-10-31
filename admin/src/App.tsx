@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   BrowserRouter,
   Navigate,
@@ -46,18 +46,111 @@ const collectionSeed: CollectionItem[] = [
   { id: 'col-2', name: 'City Layers', products: 8, status: 'Scheduled', launch: '2026-11-10' },
 ]
 
+const orderStatusOptions = ['Pending', 'Paid', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Refunded'] as const
+
 const orderSeed: OrderItem[] = [
-  { id: 'ORD-2401', customer: 'Maya Santos', total: 3240, status: 'Paid', date: '2026-10-28', channel: 'Web' },
-  { id: 'ORD-2402', customer: 'Liam Cruz', total: 1890, status: 'Processing', date: '2026-10-28', channel: 'Marketplace' },
-  { id: 'ORD-2403', customer: 'Nina Reyes', total: 4190, status: 'Pending', date: '2026-10-27', channel: 'Web' },
-  { id: 'ORD-2404', customer: 'Evan Lee', total: 1330, status: 'Paid', date: '2026-10-27', channel: 'In-store' },
+  {
+    id: 'ORD-2401',
+    customer: 'Maya Santos',
+    total: 3240,
+    status: 'Paid',
+    date: '2026-10-28',
+    channel: 'Web',
+    shippingAddress: 'BGC, Taguig, Metro Manila',
+    paymentMethod: 'Card',
+    items: [
+      { name: 'Oversized Tee', qty: 1, price: 1499 },
+      { name: 'Utility Cargo', qty: 1, price: 1899 },
+      { name: 'Shipping', qty: 1, price: 240 },
+    ],
+  },
+  {
+    id: 'ORD-2402',
+    customer: 'Liam Cruz',
+    total: 1890,
+    status: 'Processing',
+    date: '2026-10-28',
+    channel: 'Marketplace',
+    shippingAddress: 'Mandaluyong, Metro Manila',
+    paymentMethod: 'GCash',
+    items: [
+      { name: 'Cotton Crew', qty: 2, price: 999 },
+      { name: 'Shipping', qty: 1, price: 150 },
+    ],
+  },
+  {
+    id: 'ORD-2403',
+    customer: 'Nina Reyes',
+    total: 4190,
+    status: 'Pending',
+    date: '2026-10-27',
+    channel: 'Web',
+    shippingAddress: 'Davao City, Davao del Sur',
+    paymentMethod: 'Maya',
+    items: [
+      { name: 'Lightweight Shell', qty: 1, price: 2399 },
+      { name: 'Utility Cargo', qty: 1, price: 1899 },
+    ],
+  },
+  {
+    id: 'ORD-2404',
+    customer: 'Evan Lee',
+    total: 1330,
+    status: 'Shipped',
+    date: '2026-10-27',
+    channel: 'In-store',
+    shippingAddress: 'Cebu Business Park, Cebu',
+    paymentMethod: 'Bank transfer',
+    items: [
+      { name: 'Cotton Crew', qty: 1, price: 999 },
+      { name: 'Shipping', qty: 1, price: 331 },
+    ],
+  },
 ]
 
-const dashboardStats = [
-  { label: 'Revenue', value: '₱82.4K', trend: '+12.4%', positive: true },
-  { label: 'Orders', value: '1,238', trend: '+8.1%', positive: true },
-  { label: 'Conversion', value: '3.8%', trend: '+0.9%', positive: true },
-  { label: 'Low stock', value: '18 SKUs', trend: '-5.3%', positive: false },
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5146'
+
+const activityFilters = ['All', 'Delivered', 'Pending', 'Processing']
+
+const defaultAnalytics = {
+  minimumNumber: 0,
+  averageNumber: 0,
+  maximumNumber: 0,
+  monthLabel: 'This month',
+  days: [] as Array<{ date: string; value: number; orders: number; total: number; isCurrentDay: boolean }>,
+}
+
+function buildCalendarCells(days: typeof defaultAnalytics.days, monthDate = new Date()) {
+  const firstOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1)
+  const leadingDays = firstOfMonth.getDay()
+  const startDate = new Date(firstOfMonth)
+  startDate.setDate(firstOfMonth.getDate() - leadingDays)
+
+  const dayMap = new Map(days.map((day) => [day.date, day]))
+  const cells: Array<{ date: string; dayNumber: number; inMonth: boolean; entry?: typeof defaultAnalytics.days[number]; isCurrentDay: boolean }> = []
+
+  for (let index = 0; index < 35; index += 1) {
+    const cellDate = new Date(startDate)
+    cellDate.setDate(startDate.getDate() + index)
+    const dateKey = cellDate.toISOString().slice(0, 10)
+    const entry = dayMap.get(dateKey)
+    cells.push({
+      date: dateKey,
+      dayNumber: cellDate.getDate(),
+      inMonth: cellDate.getMonth() === monthDate.getMonth(),
+      entry,
+      isCurrentDay: dateKey === new Date().toISOString().slice(0, 10),
+    })
+  }
+
+  return cells
+}
+
+const defaultShipmentTable = [
+  { id: 'ORD-2401', category: 'Streetwear', weight: '1,280 g', company: 'Snug Rebel Studio', time: '31 Oct, 2026', route: 'Makati - Cebu', value: '₱5,678.00', status: 'Delivered' },
+  { id: 'ORD-2402', category: 'Essentials', weight: '920 g', company: 'Northwind Apparel', time: '29 Oct, 2026', route: 'Quezon City - Davao', value: '₱2,940.00', status: 'Processing' },
+  { id: 'ORD-2403', category: 'Outerwear', weight: '1,760 g', company: 'City Layers', time: '27 Oct, 2026', route: 'Pasig - Iloilo', value: '₱8,120.00', status: 'Pending' },
+  { id: 'ORD-2404', category: 'Accessories', weight: '640 g', company: 'Drift & Co', time: '26 Oct, 2026', route: 'BGC - Cagayan', value: '₱3,410.00', status: 'Delivered' },
 ]
 
 const navItems = [
@@ -227,8 +320,8 @@ function LoginPage({
   onToggleTheme: () => void
 }) {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('hello@example.com')
-  const [password, setPassword] = useState('StrongPass123!')
+  const [email, setEmail] = useState('admin@snugrebel.com')
+  const [password, setPassword] = useState('snUgr3bel@0902')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -334,9 +427,59 @@ function LoginPage({
 
 function DashboardPage() {
   const [orders] = useState<OrderItem[]>(orderSeed)
+  const [activeFilter, setActiveFilter] = useState('All')
+  const [analytics, setAnalytics] = useState(defaultAnalytics)
+  const [notifications, setNotifications] = useState(defaultShipmentTable)
+  const calendarCells = buildCalendarCells(analytics.days)
 
-  const totalRevenue = useMemo(() => orders.reduce((sum, order) => sum + order.total, 0), [orders])
-  const paidOrders = orders.filter((order) => order.status === 'Paid').length
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        const [analyticsResponse, activitiesResponse] = await Promise.all([
+          fetch(`${API_BASE}/api/Dashboard/analytics`),
+          fetch(`${API_BASE}/api/Dashboard/activities`),
+        ])
+
+        if (analyticsResponse.ok) {
+          const analyticsPayload = await analyticsResponse.json()
+          setAnalytics({
+            minimumNumber: analyticsPayload.minimumNumber ?? defaultAnalytics.minimumNumber,
+            averageNumber: analyticsPayload.averageNumber ?? defaultAnalytics.averageNumber,
+            maximumNumber: analyticsPayload.maximumNumber ?? defaultAnalytics.maximumNumber,
+            monthLabel: analyticsPayload.monthLabel ?? defaultAnalytics.monthLabel,
+            days: Array.isArray(analyticsPayload.days) ? analyticsPayload.days : defaultAnalytics.days,
+          })
+        }
+
+        if (activitiesResponse.ok) {
+          const activitiesPayload = await activitiesResponse.json()
+          const nextItems = (activitiesPayload.items ?? []).map((item: any) => ({
+            id: item.orderId ?? item.orderNumber ?? 'unknown',
+            category: item.category ?? 'General',
+            weight: item.weight ?? '0 g',
+            company: item.company ?? 'Unknown',
+            time: item.arrivalTime ? new Date(item.arrivalTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A',
+            route: item.route ?? 'N/A',
+            value: item.price ? `₱${Number(item.price).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '₱0.00',
+            status: item.status ?? 'Pending',
+          }))
+
+          if (nextItems.length > 0) {
+            setNotifications(nextItems)
+          }
+        }
+      } catch {
+        // Keep the seeded dashboard values if the backend is unavailable.
+      }
+    }
+
+    loadDashboardData()
+  }, [])
+
+  const filteredShipments =
+    activeFilter === 'All'
+      ? notifications
+      : notifications.filter((shipment) => shipment.status === activeFilter)
 
   function handleExport() {
     exportCsv(
@@ -354,10 +497,10 @@ function DashboardPage() {
 
   return (
     <div className="page-stack">
-      <section className="page-header">
+      <section className="page-header dashboard-header">
         <div>
           <p className="eyebrow">Overview</p>
-          <h2>Dashboard</h2>
+          <h2>Tracking Orders List</h2>
         </div>
         <button type="button" className="primary-button small-button" onClick={handleExport}>
           <Download size={16} />
@@ -365,81 +508,109 @@ function DashboardPage() {
         </button>
       </section>
 
-      <section className="stats-grid">
-        {dashboardStats.map((stat) => (
-          <article key={stat.label} className="stat-card">
-            <div className="stat-header">
-              <span>{stat.label}</span>
-              <span className={`trend ${stat.positive ? 'up' : 'down'}`}>{stat.trend}</span>
-            </div>
-            <strong>{stat.value}</strong>
-          </article>
-        ))}
-      </section>
-
-      <section className="analytics-grid">
-        <article className="panel-card wide-panel">
-          <div className="panel-head">
+      <section className="database-panel panel-card">
+        <div className="database-head">
+          <div className="database-title">
+            <div className="database-icon" aria-hidden="true">◌</div>
             <div>
-              <p className="eyebrow">Performance</p>
-              <h3>Sales snapshot</h3>
+              <p className="eyebrow">Orders database</p>
+              <strong>Today - 31 July, 2025</strong>
             </div>
-            <span className="status-pill success">+12.4% from last week</span>
           </div>
 
-          <div className="bar-chart" aria-label="Sales chart">
-            {[42, 57, 74, 69, 88, 96, 110].map((height, index) => (
-              <div key={index} className="bar-column">
-                <span style={{ height: `${height}%` }} />
-              </div>
+          <div className="database-actions">
+            <div className="notice-pill">You got 5 pending shipments</div>
+            <button type="button" className="secondary-button small-button">Download report</button>
+            <button type="button" className="primary-button small-button">Create shipment</button>
+          </div>
+        </div>
+      </section>
+
+      <section className="analytics-grid single-analytic">
+        <article className="panel-card analytic-panel">
+          <div className="panel-head analytic-head">
+            <div>
+              <p className="eyebrow">Analytics</p>
+              <h3>Analytic view</h3>
+            </div>
+            <div className="segmented-control" aria-label="Analytics timeframe selector">
+              <button type="button" className="segment active">Day</button>
+              <button type="button" className="segment">Week</button>
+              <button type="button" className="segment">Month</button>
+              <button type="button" className="segment">Quarter</button>
+              <button type="button" className="segment">Year</button>
+            </div>
+          </div>
+
+          <div className="analytic-metrics">
+            <div className="analytic-metric">
+              <strong>{analytics.minimumNumber}</strong>
+              <span>minimum number</span>
+            </div>
+            <div className="analytic-metric">
+              <strong>{analytics.averageNumber}</strong>
+              <span>average number</span>
+            </div>
+            <div className="analytic-metric">
+              <strong>{analytics.maximumNumber}</strong>
+              <span>maximum number</span>
+            </div>
+          </div>
+
+          <div className="heatmap-calendar-wrapper" aria-label="Analytic heat map calendar">
+            <div className="heatmap-weekday-row">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                <span key={day} className="heatmap-weekday">{day}</span>
+              ))}
+            </div>
+
+            <div className="heatmap-calendar-grid">
+              {calendarCells.map((cell) => (
+                <div
+                  key={cell.date}
+                  className={`heatmap-calendar-cell ${!cell.inMonth ? 'blank' : ''} ${cell.isCurrentDay ? 'current' : ''}`}
+                  style={{
+                    opacity: cell.entry ? 1 : 0.55,
+                    background: cell.entry
+                      ? `linear-gradient(180deg, rgba(105,208,144,${0.25 + (cell.entry.value || 0) * 0.75}), rgba(20,89,47,${0.82 + (cell.entry.value || 0) * 0.18}))`
+                      : 'rgba(139, 160, 148, 0.08)',
+                  }}
+                >
+                  <div className="calendar-cell-content">
+                    <span className="calendar-day-number">{cell.dayNumber}</span>
+                    {cell.entry ? (
+                      <>
+                        <span className="calendar-badge">{cell.entry.orders}</span>
+                        <span className="calendar-total">{Math.round(cell.entry.total)}</span>
+                      </>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section className="panel-card activity-panel">
+        <div className="panel-head activity-head">
+          <div>
+            <p className="eyebrow">Notifications</p>
+            <h3>Recent activities</h3>
+          </div>
+
+          <div className="activity-filters">
+            {activityFilters.map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                className={`activity-filter ${filter === activeFilter ? 'active' : ''}`}
+                onClick={() => setActiveFilter(filter)}
+              >
+                {filter}
+              </button>
             ))}
           </div>
-
-          <div className="mini-legend">
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
-          </div>
-        </article>
-
-        <article className="panel-card">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">Summary</p>
-              <h3>Quick metrics</h3>
-            </div>
-          </div>
-
-          <div className="summary-list">
-            <div>
-              <span>Gross sales</span>
-              <strong>{formatMoney(totalRevenue)}</strong>
-            </div>
-            <div>
-              <span>Orders paid</span>
-              <strong>{paidOrders}</strong>
-            </div>
-            <div>
-              <span>Returning buyers</span>
-              <strong>28%</strong>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <section className="panel-card">
-        <div className="panel-head">
-          <div>
-            <p className="eyebrow">Activity</p>
-            <h3>Recent orders</h3>
-          </div>
-          <button type="button" className="secondary-button small-button">
-            View all
-          </button>
         </div>
 
         <div className="table-wrap">
@@ -447,24 +618,30 @@ function DashboardPage() {
             <thead>
               <tr>
                 <th>Order ID</th>
-                <th>Customer</th>
-                <th>Total</th>
+                <th>Category</th>
+                <th>Weight</th>
+                <th>Company</th>
+                <th>Arrival time</th>
+                <th>Route</th>
+                <th>Price</th>
                 <th>Status</th>
-                <th>Channel</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr key={order.id}>
-                  <td>{order.id}</td>
-                  <td>{order.customer}</td>
-                  <td>{formatMoney(order.total)}</td>
+              {filteredShipments.map((shipment) => (
+                <tr key={shipment.id}>
+                  <td>{shipment.id}</td>
+                  <td>{shipment.category}</td>
+                  <td>{shipment.weight}</td>
+                  <td>{shipment.company}</td>
+                  <td>{shipment.time}</td>
+                  <td>{shipment.route}</td>
+                  <td>{shipment.value}</td>
                   <td>
-                    <span className={`status-pill ${order.status === 'Paid' ? 'success' : order.status === 'Processing' ? 'warning' : 'neutral'}`}>
-                      {order.status}
+                    <span className={`status-pill ${shipment.status === 'Delivered' ? 'success' : shipment.status === 'Processing' ? 'warning' : 'neutral'}`}>
+                      {shipment.status}
                     </span>
                   </td>
-                  <td>{order.channel}</td>
                 </tr>
               ))}
             </tbody>
@@ -757,9 +934,11 @@ function CollectionsPage() {
 
 function OrdersPage() {
   const [orders, setOrders] = useState<OrderItem[]>(orderSeed)
+  const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null)
 
   function updateStatus(id: string, status: OrderItem['status']) {
     setOrders((current) => current.map((order) => (order.id === id ? { ...order, status } : order)))
+    setSelectedOrder((current) => (current && current.id === id ? { ...current, status } : current))
   }
 
   function handleExport() {
@@ -774,6 +953,16 @@ function OrdersPage() {
         channel: order.channel,
       })),
     )
+  }
+
+  function getStatusTone(status: OrderItem['status']) {
+    if (status === 'Paid' || status === 'Shipped' || status === 'Delivered') {
+      return 'success'
+    }
+    if (status === 'Processing' || status === 'Pending') {
+      return 'warning'
+    }
+    return 'neutral'
   }
 
   return (
@@ -808,14 +997,11 @@ function OrdersPage() {
                   <td>{order.customer}</td>
                   <td>{formatMoney(order.total)}</td>
                   <td>
-                    <span className={`status-pill ${order.status === 'Paid' ? 'success' : order.status === 'Processing' ? 'warning' : 'neutral'}`}>{order.status}</span>
+                    <span className={`status-pill ${getStatusTone(order.status)}`}>{order.status}</span>
                   </td>
                   <td className="actions-cell">
-                    <button type="button" className="link-button" onClick={() => updateStatus(order.id, 'Paid')}>
-                      Mark paid
-                    </button>
-                    <button type="button" className="link-button" onClick={() => updateStatus(order.id, 'Processing')}>
-                      Process
+                    <button type="button" className="link-button" onClick={() => setSelectedOrder(order)}>
+                      View details
                     </button>
                   </td>
                 </tr>
@@ -824,6 +1010,84 @@ function OrdersPage() {
           </table>
         </div>
       </section>
+
+      {selectedOrder ? (
+        <div className="order-modal-backdrop" onClick={() => setSelectedOrder(null)}>
+          <div className="order-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="order-modal-header">
+              <div>
+                <p className="eyebrow">Order details</p>
+                <h3>{selectedOrder.id}</h3>
+              </div>
+              <button type="button" className="icon-button" onClick={() => setSelectedOrder(null)} aria-label="Close order details">
+                ×
+              </button>
+            </div>
+
+            <div className="order-modal-grid">
+              <div className="order-detail-block">
+                <div className="order-identity">
+                  <strong>{selectedOrder.customer}</strong>
+                  <span>{selectedOrder.channel}</span>
+                </div>
+                <div className="detail-list">
+                  <div>
+                    <label>Date</label>
+                    <span>{selectedOrder.date}</span>
+                  </div>
+                  <div>
+                    <label>Shipping</label>
+                    <span>{selectedOrder.shippingAddress ?? 'Not provided'}</span>
+                  </div>
+                  <div>
+                    <label>Payment</label>
+                    <span>{selectedOrder.paymentMethod ?? 'Card'}</span>
+                  </div>
+                  <div>
+                    <label>Total</label>
+                    <span>{formatMoney(selectedOrder.total)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="order-detail-block">
+                <label>
+                  <span>Current status</span>
+                  <select value={selectedOrder.status} onChange={(event) => updateStatus(selectedOrder.id, event.target.value as OrderItem['status'])}>
+                    {orderStatusOptions.map((status) => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="detail-list compact">
+                  <div>
+                    <label>Order status</label>
+                    <span className={`status-pill ${getStatusTone(selectedOrder.status)}`}>{selectedOrder.status}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="order-items-header">
+              <h4>Items</h4>
+              <strong>{selectedOrder.items?.length ?? 0} line items</strong>
+            </div>
+
+            <div className="order-items-list">
+              {(selectedOrder.items ?? []).map((item) => (
+                <div key={`${selectedOrder.id}-${item.name}`} className="order-item-row">
+                  <div>
+                    <strong>{item.name}</strong>
+                    <span>Qty {item.qty}</span>
+                  </div>
+                  <span>{formatMoney(item.price)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

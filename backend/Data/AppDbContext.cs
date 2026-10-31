@@ -32,6 +32,10 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Color> Colors { get; set; }
 
+    public virtual DbSet<DashboardMetric> DashboardMetrics { get; set; }
+
+    public virtual DbSet<DashboardNotification> DashboardNotifications { get; set; }
+
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
@@ -883,6 +887,85 @@ public partial class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("wishlist_items__fk_user_id_fkey");
         });
+        modelBuilder.Entity<DashboardMetric>(entity =>
+        {
+            entity.HasKey(e => e.PkDashboardMetricId).HasName("dashboard_metrics_pkey");
+            entity.ToTable("dashboard_metrics");
+
+            entity.HasIndex(e => e.MetricKey, "idx_dashboard_metric_key");
+
+            entity.Property(e => e.PkDashboardMetricId)
+                .HasMaxLength(40)
+                .HasDefaultValueSql("('dmetric'::text || (gen_random_uuid())::text)")
+                .HasColumnName("_pk_dashboard_metric_id");
+            entity.Property(e => e.MetricKey)
+                .HasMaxLength(50)
+                .HasColumnName("metric_key");
+            entity.Property(e => e.MetricLabel)
+                .HasMaxLength(100)
+                .HasColumnName("metric_label");
+            entity.Property(e => e.DayOfWeek)
+                .HasMaxLength(10)
+                .HasColumnName("day_of_week");
+            entity.Property(e => e.SlotIndex)
+                .HasColumnName("slot_index");
+            entity.Property(e => e.MetricValue)
+                .HasColumnType("numeric")
+                .HasColumnName("metric_value");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<DashboardNotification>(entity =>
+        {
+            entity.HasKey(e => e.PkDashboardNotificationId).HasName("dashboard_notifications_pkey");
+            entity.ToTable("dashboard_notifications");
+
+            entity.HasIndex(e => e.Status, "idx_dashboard_notification_status");
+
+            entity.Property(e => e.PkDashboardNotificationId)
+                .HasMaxLength(40)
+                .HasDefaultValueSql("('dnotif'::text || (gen_random_uuid())::text)")
+                .HasColumnName("_pk_dashboard_notification_id");
+            entity.Property(e => e.OrderId)
+                .HasMaxLength(40)
+                .HasColumnName("order_id");
+            entity.Property(e => e.OrderNumber)
+                .HasMaxLength(40)
+                .HasColumnName("order_number");
+            entity.Property(e => e.Category)
+                .HasMaxLength(100)
+                .HasColumnName("category");
+            entity.Property(e => e.Weight)
+                .HasMaxLength(50)
+                .HasColumnName("weight");
+            entity.Property(e => e.Company)
+                .HasMaxLength(100)
+                .HasColumnName("company");
+            entity.Property(e => e.ArrivalTime)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("arrival_time");
+            entity.Property(e => e.Route)
+                .HasMaxLength(150)
+                .HasColumnName("route");
+            entity.Property(e => e.Price)
+                .HasColumnType("numeric")
+                .HasColumnName("price");
+            entity.Property(e => e.Status)
+                .HasMaxLength(30)
+                .HasColumnName("status");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("created_at");
+        });
+
         modelBuilder.HasSequence("product_display_seq").StartsAt(1000L);
 
         OnModelCreatingPartial(modelBuilder);

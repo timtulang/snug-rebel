@@ -1,6 +1,6 @@
 import type { AuthUser } from '../types'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000'
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5146'
 
 async function readErrorMessage(response: Response) {
   try {

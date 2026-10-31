@@ -40,11 +40,16 @@ export type CollectionItem = {
   launch: string
 }
 
+export type OrderStatus = 'Pending' | 'Paid' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Refunded'
+
 export type OrderItem = {
   id: string
   customer: string
   total: number
-  status: 'Paid' | 'Processing' | 'Pending'
+  status: OrderStatus
   date: string
   channel: 'Web' | 'Marketplace' | 'In-store'
+  shippingAddress?: string
+  items?: Array<{ name: string; qty: number; price: number }>
+  paymentMethod?: 'Card' | 'GCash' | 'Maya' | 'Bank transfer' | 'COD'
 }
