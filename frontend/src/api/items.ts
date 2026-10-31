@@ -43,24 +43,6 @@ export type Review = {
 // Mock data.
 // ---------------------------------------------------------------------------------------------
 
-/** Grey portrait stand-in. Replace with the real image URL from the backend. */
-const PLACEHOLDER_IMAGE =
-    'data:image/svg+xml,' +
-    encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="710" height="981"><rect width="710" height="981" fill="#7a7a7a"/></svg>',
-    )
-
-const DEFAULT_DETAILS = {
-    description:
-        'Rule-breaking comfort meets effortless street style. Built for those who refuse to compromise between a razor-sharp aesthetic and all-day wearability.',
-    colors: [
-        { name: 'Blood red', hex: '#9f0a0a' },
-        { name: 'Midnight purple', hex: '#2a1a5e' },
-        { name: 'Gold', hex: '#e8c35a' },
-    ],
-    sizes: ['S', 'M', 'L', 'XL', '2X'].map((label) => ({ label, available: true })),
-}
-
 const MOCK_REVIEWS: Review[] = [
     {
         id: 'r1',

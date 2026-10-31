@@ -35,15 +35,6 @@ export const CATEGORIES: { value: Category; label: string; sidebar?: boolean }[]
     { value: 'accessories', label: 'Accessories' },
 ]
 
-/** Grey square stand-in. Swap each product's imageSrc for a real image URL. */
-const PLACEHOLDER =
-    'data:image/svg+xml,' +
-    encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="#7a7a7a"/></svg>',
-    )
-
-const base = { imageSrc: PLACEHOLDER, rating: 5, reviewCount: 10, soldCount: 20 }
-
 // export const PRODUCTS: Product[] = [
 //     { ...base, id: 'p1', name: 'Item name', price: 500, badge: 'new', categories: ['tops'] },
 //     { ...base, id: 'p2', name: 'Item name na mahaba', price: 500, salePrice: 250, soldCount: 64, categories: ['bottoms', 'best-selling'] },
