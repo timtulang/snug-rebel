@@ -16,6 +16,7 @@ import {
   LogOut,
   MoonStar,
   Package,
+  Plus,
   ShoppingCart,
   SunMedium,
   Tag,
@@ -28,11 +29,99 @@ import type { CategoryItem, CollectionItem, OrderItem, ProductItem, SessionUser 
 const STORAGE_KEY = 'snug-rebel-admin-session'
 const THEME_KEY = 'snug-rebel-admin-theme'
 
+const createVariantTemplate = (overrides: Partial<ProductItem['variants'][number]> = {}): ProductItem['variants'][number] => ({
+  id: `var-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+  sku: `SR-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+  size: 'M',
+  color: 'Black',
+  stock: 12,
+  priceOverride: 0,
+  isActive: true,
+  ...overrides,
+})
+
 const productSeed: ProductItem[] = [
-  { id: 'prd-101', name: 'Oversized Tee', category: 'Streetwear', price: 1299, stock: 42, status: 'Active', sku: 'SR-OT-01', variants: 4 },
-  { id: 'prd-102', name: 'Utility Cargo', category: 'Essentials', price: 1899, stock: 11, status: 'Low stock', sku: 'SR-UC-11', variants: 3 },
-  { id: 'prd-103', name: 'Lightweight Shell', category: 'Outerwear', price: 2399, stock: 28, status: 'Active', sku: 'SR-LS-09', variants: 5 },
-  { id: 'prd-104', name: 'Cotton Crew', category: 'Basics', price: 999, stock: 0, status: 'Draft', sku: 'SR-CC-22', variants: 2 },
+  {
+    id: 'prd-101',
+    displayId: 'SR-OT-01',
+    slug: 'oversized-tee',
+    name: 'Oversized Tee',
+    category: 'Streetwear',
+    categoryId: 'ctg-streetwear',
+    description: 'Relaxed oversized cotton tee with structured drape.',
+    price: 1299,
+    material: '100% cotton',
+    stock: 42,
+    isActive: true,
+    status: 'Active',
+    sku: 'SR-OT-01',
+    variants: [
+      createVariantTemplate({ id: 'var-ot-s', sku: 'SR-OT-01-S-BLK', size: 'S', color: 'Black', stock: 12 }),
+      createVariantTemplate({ id: 'var-ot-m', sku: 'SR-OT-01-M-BLK', size: 'M', color: 'Black', stock: 14 }),
+      createVariantTemplate({ id: 'var-ot-l', sku: 'SR-OT-01-L-BLK', size: 'L', color: 'Black', stock: 9 }),
+      createVariantTemplate({ id: 'var-ot-xl', sku: 'SR-OT-01-XL-BLK', size: 'XL', color: 'Black', stock: 7 }),
+    ],
+  },
+  {
+    id: 'prd-102',
+    displayId: 'SR-UC-11',
+    slug: 'utility-cargo',
+    name: 'Utility Cargo',
+    category: 'Essentials',
+    categoryId: 'ctg-essentials',
+    description: 'Utility-inspired cargo pant with clean detailing.',
+    price: 1899,
+    material: 'Cotton twill',
+    stock: 11,
+    isActive: true,
+    status: 'Low stock',
+    sku: 'SR-UC-11',
+    variants: [
+      createVariantTemplate({ id: 'var-uc-30', sku: 'SR-UC-11-30-OLV', size: '30', color: 'Olive', stock: 5 }),
+      createVariantTemplate({ id: 'var-uc-32', sku: 'SR-UC-11-32-OLV', size: '32', color: 'Olive', stock: 3 }),
+      createVariantTemplate({ id: 'var-uc-34', sku: 'SR-UC-11-34-OLV', size: '34', color: 'Olive', stock: 3 }),
+    ],
+  },
+  {
+    id: 'prd-103',
+    displayId: 'SR-LS-09',
+    slug: 'lightweight-shell',
+    name: 'Lightweight Shell',
+    category: 'Outerwear',
+    categoryId: 'ctg-outerwear',
+    description: 'Water-resistant shell built for layering.',
+    price: 2399,
+    material: 'Ripstop nylon',
+    stock: 28,
+    isActive: true,
+    status: 'Active',
+    sku: 'SR-LS-09',
+    variants: [
+      createVariantTemplate({ id: 'var-ls-s', sku: 'SR-LS-09-S-ASH', size: 'S', color: 'Ash', stock: 6 }),
+      createVariantTemplate({ id: 'var-ls-m', sku: 'SR-LS-09-M-ASH', size: 'M', color: 'Ash', stock: 7 }),
+      createVariantTemplate({ id: 'var-ls-l', sku: 'SR-LS-09-L-ASH', size: 'L', color: 'Ash', stock: 8 }),
+      createVariantTemplate({ id: 'var-ls-xl', sku: 'SR-LS-09-XL-ASH', size: 'XL', color: 'Ash', stock: 7 }),
+    ],
+  },
+  {
+    id: 'prd-104',
+    displayId: 'SR-CC-22',
+    slug: 'cotton-crew',
+    name: 'Cotton Crew',
+    category: 'Basics',
+    categoryId: 'ctg-basics',
+    description: 'Essential crew top designed for everyday wear.',
+    price: 999,
+    material: 'Organic cotton',
+    stock: 0,
+    isActive: false,
+    status: 'Inactive',
+    sku: 'SR-CC-22',
+    variants: [
+      createVariantTemplate({ id: 'var-cc-s', sku: 'SR-CC-22-S-CRM', size: 'S', color: 'Cream', stock: 0, isActive: false }),
+      createVariantTemplate({ id: 'var-cc-m', sku: 'SR-CC-22-M-CRM', size: 'M', color: 'Cream', stock: 0, isActive: false }),
+    ],
+  },
 ]
 
 const categorySeed: CategoryItem[] = [
@@ -430,7 +519,10 @@ function DashboardPage() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [analytics, setAnalytics] = useState(defaultAnalytics)
   const [notifications, setNotifications] = useState(defaultShipmentTable)
+  const pendingShipments = notifications.filter((item) => item.status === 'Pending' || item.status === 'Processing').length
+  const dashboardDateLabel = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())
   const calendarCells = buildCalendarCells(analytics.days)
+  const maxHeatOrders = Math.max(1, ...analytics.days.map((entry) => Number(entry.orders ?? 0)))
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -442,12 +534,32 @@ function DashboardPage() {
 
         if (analyticsResponse.ok) {
           const analyticsPayload = await analyticsResponse.json()
+          const normalizedDays = Array.isArray(analyticsPayload.days)
+            ? analyticsPayload.days
+            : Array.isArray(analyticsPayload.heatmap)
+              ? analyticsPayload.heatmap.map((entry: any, index: number) => ({
+                  date: `${new Date().toISOString().slice(0, 8)}${String(index + 1).padStart(2, '0')}`,
+                  value: Array.isArray(entry?.values) ? Math.max(...entry.values.map((value: number) => Number(value) || 0)) : 0,
+                  orders: Array.isArray(entry?.values) ? entry.values.reduce((sum: number, value: number) => sum + (Number(value) || 0), 0) : 0,
+                  total: Array.isArray(entry?.values) ? entry.values.reduce((sum: number, value: number) => sum + (Number(value) || 0), 0) : 0,
+                  isCurrentDay: false,
+                }))
+              : defaultAnalytics.days
+
+          const numericValues: number[] = normalizedDays
+            .map((entry: any) => Number(entry?.orders ?? entry?.value ?? 0))
+            .filter((value: number) => Number.isFinite(value))
+
+          const nextMinimum = Number(analyticsPayload.minimumNumber ?? (numericValues.length ? Math.min(...numericValues) : defaultAnalytics.minimumNumber))
+          const nextAverage = Number(analyticsPayload.averageNumber ?? (numericValues.length ? Math.round(numericValues.reduce((sum: number, value: number) => sum + value, 0) / numericValues.length) : defaultAnalytics.averageNumber))
+          const nextMaximum = Number(analyticsPayload.maximumNumber ?? (numericValues.length ? Math.max(...numericValues) : defaultAnalytics.maximumNumber))
+
           setAnalytics({
-            minimumNumber: analyticsPayload.minimumNumber ?? defaultAnalytics.minimumNumber,
-            averageNumber: analyticsPayload.averageNumber ?? defaultAnalytics.averageNumber,
-            maximumNumber: analyticsPayload.maximumNumber ?? defaultAnalytics.maximumNumber,
+            minimumNumber: nextMinimum,
+            averageNumber: nextAverage,
+            maximumNumber: nextMaximum,
             monthLabel: analyticsPayload.monthLabel ?? defaultAnalytics.monthLabel,
-            days: Array.isArray(analyticsPayload.days) ? analyticsPayload.days : defaultAnalytics.days,
+            days: normalizedDays,
           })
         }
 
@@ -514,12 +626,12 @@ function DashboardPage() {
             <div className="database-icon" aria-hidden="true">◌</div>
             <div>
               <p className="eyebrow">Orders database</p>
-              <strong>Today - 31 July, 2025</strong>
+              <strong>Today - {dashboardDateLabel}</strong>
             </div>
           </div>
 
           <div className="database-actions">
-            <div className="notice-pill">You got 5 pending shipments</div>
+            <div className="notice-pill">You got {pendingShipments} pending shipments</div>
             <button type="button" className="secondary-button small-button">Download report</button>
             <button type="button" className="primary-button small-button">Create shipment</button>
           </div>
@@ -565,28 +677,34 @@ function DashboardPage() {
             </div>
 
             <div className="heatmap-calendar-grid">
-              {calendarCells.map((cell) => (
-                <div
-                  key={cell.date}
-                  className={`heatmap-calendar-cell ${!cell.inMonth ? 'blank' : ''} ${cell.isCurrentDay ? 'current' : ''}`}
-                  style={{
-                    opacity: cell.entry ? 1 : 0.55,
-                    background: cell.entry
-                      ? `linear-gradient(180deg, rgba(105,208,144,${0.25 + (cell.entry.value || 0) * 0.75}), rgba(20,89,47,${0.82 + (cell.entry.value || 0) * 0.18}))`
-                      : 'rgba(139, 160, 148, 0.08)',
-                  }}
-                >
-                  <div className="calendar-cell-content">
-                    <span className="calendar-day-number">{cell.dayNumber}</span>
-                    {cell.entry ? (
-                      <>
-                        <span className="calendar-badge">{cell.entry.orders}</span>
-                        <span className="calendar-total">{Math.round(cell.entry.total)}</span>
-                      </>
-                    ) : null}
+              {calendarCells.map((cell) => {
+                const activeOrders = Number(cell.entry?.orders ?? 0)
+                const threshold = Math.max(2, Math.ceil(maxHeatOrders / 3))
+                const intensity = activeOrders > 0
+                  ? Math.min(1, 0.08 + Math.max(0, activeOrders - 1) / Math.max(1, threshold) * 0.92)
+                  : 0
+
+                return (
+                  <div
+                    key={cell.date}
+                    className={`heatmap-calendar-cell ${!cell.inMonth ? 'blank' : ''} ${cell.isCurrentDay ? 'current' : ''}`}
+                    style={{
+                      opacity: 1,
+                      background: activeOrders > 0 ? `rgba(45, 143, 91, ${intensity})` : 'rgba(255, 255, 255, 0.96)',
+                    }}
+                  >
+                    <div className="calendar-cell-content">
+                      <span className="calendar-day-number">{cell.dayNumber}</span>
+                      {activeOrders > 0 ? (
+                        <>
+                          <span className="calendar-badge">{activeOrders}</span>
+                          <span className="calendar-total">{Math.round(Number(cell.entry?.total ?? 0))}</span>
+                        </>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </article>
@@ -655,30 +773,82 @@ function DashboardPage() {
 function ProductsPage() {
   const [products, setProducts] = useState<ProductItem[]>(productSeed)
   const [form, setForm] = useState({
+    displayId: '',
+    slug: '',
     name: '',
     category: 'Streetwear',
+    categoryId: 'ctg-streetwear',
+    description: '',
+    material: '',
     price: '1499',
     stock: '20',
-    status: 'Active' as ProductItem['status'],
+    isActive: true,
+    variants: [createVariantTemplate({ sku: 'SR-OT-01-M-BLK', size: 'M', color: 'Black', stock: 20 })],
   })
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null)
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false)
 
-  function handleChange(field: string, value: string) {
+  function handleChange(field: string, value: string | boolean | ProductItem['variants']) {
     setForm((current) => ({ ...current, [field]: value }))
+  }
+
+  function handleVariantChange(index: number, field: keyof ProductItem['variants'][number], value: string | number | boolean) {
+    setForm((current) => ({
+      ...current,
+      variants: current.variants.map((variant, variantIndex) =>
+        variantIndex === index ? { ...variant, [field]: value } : variant,
+      ),
+    }))
+  }
+
+  function handleAddVariant() {
+    setForm((current) => ({
+      ...current,
+      variants: [...current.variants, createVariantTemplate()],
+    }))
+  }
+
+  function handleRemoveVariant(index: number) {
+    setForm((current) => ({
+      ...current,
+      variants: current.variants.filter((_, variantIndex) => variantIndex !== index),
+    }))
+  }
+
+  function getTotalStock(variants: ProductItem['variants']) {
+    return variants.reduce((sum, variant) => sum + Math.max(0, variant.stock), 0)
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
+    const normalizedVariants = form.variants
+      .filter((variant) => variant.size || variant.color || variant.sku)
+      .map((variant) => ({
+        ...variant,
+        sku: variant.sku || `SR-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+        stock: Number(variant.stock) || 0,
+        priceOverride: Number(variant.priceOverride) || 0,
+      }))
+
+    const totalStock = getTotalStock(normalizedVariants)
+
     const nextProduct: ProductItem = {
       id: editingId ?? `prd-${Date.now()}`,
+      displayId: form.displayId || `SR-${(Math.random() + 1).toString(36).slice(2, 6).toUpperCase()}`,
+      slug: form.slug || (form.name || 'new-product').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
       name: form.name || 'New product',
       category: form.category,
+      categoryId: form.categoryId,
+      description: form.description || 'New product description.',
+      material: form.material || 'Cotton blend',
       price: Number(form.price) || 0,
-      stock: Number(form.stock) || 0,
-      status: form.status,
-      sku: `SR-${(Math.random() + 1).toString(36).slice(2, 6).toUpperCase()}`,
-      variants: 2,
+      stock: totalStock,
+      isActive: form.isActive,
+      status: form.isActive ? (totalStock <= 0 ? 'Draft' : totalStock < 12 ? 'Low stock' : 'Active') : 'Inactive',
+      sku: form.displayId || `SR-${(Math.random() + 1).toString(36).slice(2, 6).toUpperCase()}`,
+      variants: normalizedVariants,
     }
 
     if (editingId) {
@@ -687,23 +857,79 @@ function ProductsPage() {
       setProducts((current) => [nextProduct, ...current])
     }
 
-    setForm({ name: '', category: 'Streetwear', price: '1499', stock: '20', status: 'Active' })
+    setForm({
+      displayId: '',
+      slug: '',
+      name: '',
+      category: 'Streetwear',
+      categoryId: 'ctg-streetwear',
+      description: '',
+      material: '',
+      price: '1499',
+      stock: '20',
+      isActive: true,
+      variants: [createVariantTemplate({ sku: 'SR-OT-01-M-BLK', size: 'M', color: 'Black', stock: 20 })],
+    })
     setEditingId(null)
+    setIsProductModalOpen(false)
   }
 
   function handleEdit(product: ProductItem) {
     setEditingId(product.id)
     setForm({
+      displayId: product.displayId || product.sku,
+      slug: product.slug,
       name: product.name,
       category: product.category,
+      categoryId: product.categoryId || 'ctg-streetwear',
+      description: product.description || '',
+      material: product.material || '',
       price: String(product.price),
       stock: String(product.stock),
-      status: product.status,
+      isActive: product.isActive,
+      variants: product.variants.length ? product.variants : [createVariantTemplate()],
     })
+    setIsProductModalOpen(true)
   }
 
-  function handleDelete(id: string) {
-    setProducts((current) => current.filter((item) => item.id !== id))
+  function handleDeactivate(id: string) {
+    setProducts((current) =>
+      current.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              isActive: false,
+              status: 'Inactive',
+              variants: item.variants.map((variant) => ({ ...variant, isActive: false })),
+            }
+          : item,
+      ),
+    )
+    setSelectedProduct((current) =>
+      current && current.id === id ? { ...current, isActive: false, status: 'Inactive', variants: current.variants.map((variant) => ({ ...variant, isActive: false })) } : current,
+    )
+  }
+
+  function openProductDetails(product: ProductItem) {
+    setSelectedProduct(product)
+  }
+
+  function openCreateProductModal() {
+    setEditingId(null)
+    setForm({
+      displayId: '',
+      slug: '',
+      name: '',
+      category: 'Streetwear',
+      categoryId: 'ctg-streetwear',
+      description: '',
+      material: '',
+      price: '1499',
+      stock: '20',
+      isActive: true,
+      variants: [createVariantTemplate({ sku: 'SR-OT-01-M-BLK', size: 'M', color: 'Black', stock: 20 })],
+    })
+    setIsProductModalOpen(true)
   }
 
   return (
@@ -713,31 +939,262 @@ function ProductsPage() {
           <p className="eyebrow">Catalog</p>
           <h2>Products</h2>
         </div>
-        <button type="button" className="secondary-button small-button" onClick={() => exportCsv('products-export.csv', products.map((item) => ({ id: item.id, name: item.name, category: item.category, price: item.price, stock: item.stock, status: item.status })))}>
-          <Download size={16} />
-          Export CSV
-        </button>
+        <div className="page-actions">
+          <button
+            type="button"
+            className="secondary-button small-button"
+            onClick={() =>
+              exportCsv(
+                'products-export.csv',
+                products.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  category: item.category,
+                  price: item.price,
+                  stock: item.stock,
+                  status: item.status,
+                })),
+              )
+            }
+          >
+            <Download size={16} />
+            Export CSV
+          </button>
+          <button type="button" className="primary-button small-button" onClick={openCreateProductModal}>
+            <Plus size={16} />
+            Create product
+          </button>
+        </div>
       </section>
 
-      <div className="content-grid two-column">
-        <section className="panel-card">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">Inventory</p>
-              <h3>{editingId ? 'Edit product' : 'Add product'}</h3>
+      <section className="panel-card">
+        <div className="panel-head">
+          <div>
+            <p className="eyebrow">Catalog</p>
+            <h3>Current items</h3>
+          </div>
+        </div>
+
+        <div className="table-wrap compact">
+          <table>
+            <thead>
+              <tr>
+                <th>Display ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id} className="row-clickable" onClick={() => openProductDetails(product)}>
+                  <td>{product.displayId}</td>
+                  <td>{product.name}</td>
+                  <td>{product.category}</td>
+                  <td>{formatMoney(product.price)}</td>
+                  <td>{product.stock}</td>
+                  <td>
+                    <span
+                      className={`status-pill ${
+                        product.status === 'Active' ? 'success' : product.status === 'Low stock' ? 'warning' : 'neutral'
+                      }`}
+                    >
+                      {product.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {selectedProduct ? (
+        <div className="order-modal-backdrop" onClick={() => setSelectedProduct(null)}>
+          <div className="order-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="order-modal-header">
+              <div>
+                <p className="eyebrow">Product details</p>
+                <h3>{selectedProduct.name}</h3>
+              </div>
+              <button type="button" className="icon-button" onClick={() => setSelectedProduct(null)} aria-label="Close product details">
+                ×
+              </button>
+            </div>
+
+            <div className="order-modal-grid">
+              <div className="order-detail-block">
+                <div className="detail-list">
+                  <div>
+                    <label>Display ID</label>
+                    <span>{selectedProduct.displayId}</span>
+                  </div>
+                  <div>
+                    <label>Slug</label>
+                    <span>{selectedProduct.slug}</span>
+                  </div>
+                  <div>
+                    <label>Category</label>
+                    <span>{selectedProduct.category}</span>
+                  </div>
+                  <div>
+                    <label>Material</label>
+                    <span>{selectedProduct.material || 'Unknown'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="order-detail-block">
+                <div className="detail-list">
+                  <div>
+                    <label>Price</label>
+                    <span>{formatMoney(selectedProduct.price)}</span>
+                  </div>
+                  <div>
+                    <label>Stock</label>
+                    <span>{selectedProduct.stock} units</span>
+                  </div>
+                  <div>
+                    <label>Status</label>
+                    <span
+                      className={`status-pill ${
+                        selectedProduct.status === 'Active' ? 'success' : selectedProduct.status === 'Low stock' ? 'warning' : 'neutral'
+                      }`}
+                    >
+                      {selectedProduct.status}
+                    </span>
+                  </div>
+                  <div>
+                    <label>Variants</label>
+                    <span>{selectedProduct.variants.length} options</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="order-items-header">
+              <h4>Description</h4>
+            </div>
+            <p className="empty-state-copy">{selectedProduct.description || 'No description yet.'}</p>
+
+            <div className="order-items-header">
+              <h4>Inventory</h4>
+            </div>
+
+            <div className="inventory-table-wrap">
+              <table className="inventory-table">
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Size</th>
+                    <th>Color</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedProduct.variants.map((variant) => (
+                    <tr key={variant.id}>
+                      <td>{variant.sku}</td>
+                      <td>{variant.size}</td>
+                      <td>{variant.color}</td>
+                      <td>{variant.stock}</td>
+                      <td>
+                        <span className={`status-pill ${variant.isActive ? 'success' : 'neutral'}`}>
+                          {variant.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="order-items-header">
+              <h4>Actions</h4>
+            </div>
+
+            <div className="order-items-list">
+              <div className="order-item-row">
+                <div>
+                  <strong>Product actions</strong>
+                  <span>Update, review, or deactivate this item</span>
+                </div>
+                <div className="actions-cell">
+                  <button
+                    type="button"
+                    className="primary-button small-button"
+                    onClick={() => {
+                      setSelectedProduct(null)
+                      handleEdit(selectedProduct)
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="link-button danger"
+                    onClick={() => {
+                      setSelectedProduct(null)
+                      handleDeactivate(selectedProduct.id)
+                    }}
+                  >
+                    Deactivate
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      ) : null}
 
-          <form className="entity-form" onSubmit={handleSubmit}>
-            <label>
-              <span>Product name</span>
-              <input value={form.name} onChange={(event) => handleChange('name', event.target.value)} placeholder="Oversized Tee" />
-            </label>
+      {isProductModalOpen ? (
+        <div className="order-modal-backdrop" onClick={() => setIsProductModalOpen(false)}>
+          <div className="order-modal product-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="order-modal-header">
+              <div>
+                <p className="eyebrow">Catalog</p>
+                <h3>{editingId ? 'Edit product' : 'Create product'}</h3>
+              </div>
+              <button type="button" className="icon-button" onClick={() => setIsProductModalOpen(false)} aria-label="Close product form">
+                ×
+              </button>
+            </div>
 
-            <div className="inline-form">
+            <form className="product-form-grid" onSubmit={handleSubmit}>
+              <label>
+                <span>Display ID</span>
+                <input value={form.displayId} onChange={(event) => handleChange('displayId', event.target.value)} placeholder="SR-OT-01" />
+              </label>
+
+              <label>
+                <span>Slug</span>
+                <input value={form.slug} onChange={(event) => handleChange('slug', event.target.value)} placeholder="oversized-tee" />
+              </label>
+
+              <label className="full-span">
+                <span>Product name</span>
+                <input value={form.name} onChange={(event) => handleChange('name', event.target.value)} placeholder="Oversized Tee" />
+              </label>
+
               <label>
                 <span>Category</span>
-                <select value={form.category} onChange={(event) => handleChange('category', event.target.value)}>
+                <select
+                  value={form.category}
+                  onChange={(event) => {
+                    const selected = event.target.value
+                    const categoryMap: Record<string, string> = {
+                      Streetwear: 'ctg-streetwear',
+                      Essentials: 'ctg-essentials',
+                      Outerwear: 'ctg-outerwear',
+                      Basics: 'ctg-basics',
+                    }
+                    handleChange('category', selected)
+                    handleChange('categoryId', categoryMap[selected] ?? 'ctg-streetwear')
+                  }}
+                >
                   <option>Streetwear</option>
                   <option>Essentials</option>
                   <option>Outerwear</option>
@@ -746,78 +1203,89 @@ function ProductsPage() {
               </label>
 
               <label>
-                <span>Status</span>
-                <select value={form.status} onChange={(event) => handleChange('status', event.target.value)}>
-                  <option value="Active">Active</option>
-                  <option value="Low stock">Low stock</option>
-                  <option value="Draft">Draft</option>
-                </select>
+                <span>Material</span>
+                <input value={form.material} onChange={(event) => handleChange('material', event.target.value)} placeholder="Cotton blend" />
               </label>
-            </div>
 
-            <div className="inline-form">
+              <label className="full-span">
+                <span>Description</span>
+                <textarea value={form.description} onChange={(event) => handleChange('description', event.target.value)} rows={4} placeholder="Describe the product, fit, and the core material story." />
+              </label>
+
               <label>
-                <span>Price</span>
+                <span>Base price</span>
                 <input type="number" value={form.price} onChange={(event) => handleChange('price', event.target.value)} />
               </label>
 
               <label>
-                <span>Stock</span>
-                <input type="number" value={form.stock} onChange={(event) => handleChange('stock', event.target.value)} />
+                <span>Active</span>
+                <input type="checkbox" checked={form.isActive} onChange={(event) => handleChange('isActive', event.target.checked)} />
               </label>
-            </div>
 
-            <button type="submit" className="primary-button">
-              {editingId ? 'Update product' : 'Create product'}
-            </button>
-          </form>
-        </section>
+              <div className="full-span inventory-editor">
+                <div className="inventory-editor-header">
+                  <h4>Variant inventory</h4>
+                  <button type="button" className="secondary-button small-button" onClick={handleAddVariant}>Add variant</button>
+                </div>
 
-        <section className="panel-card">
-          <div className="panel-head">
-            <div>
-              <p className="eyebrow">Catalog</p>
-              <h3>Current items</h3>
-            </div>
-          </div>
+                {form.variants.map((variant, index) => (
+                  <div key={variant.id} className="variant-row">
+                    <div className="variant-grid">
+                      <label>
+                        <span>SKU</span>
+                        <input value={variant.sku} onChange={(event) => handleVariantChange(index, 'sku', event.target.value)} />
+                      </label>
 
-          <div className="table-wrap compact">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                  <th>State</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product) => (
-                  <tr key={product.id}>
-                    <td>{product.name}</td>
-                    <td>{formatMoney(product.price)}</td>
-                    <td>{product.stock}</td>
-                    <td>
-                      <span className={`status-pill ${product.status === 'Active' ? 'success' : product.status === 'Low stock' ? 'warning' : 'neutral'}`}>
-                        {product.status}
-                      </span>
-                    </td>
-                    <td className="actions-cell">
-                      <button type="button" className="link-button" onClick={() => handleEdit(product)}>Edit</button>
-                      <button type="button" className="link-button danger" onClick={() => handleDelete(product.id)}>Delete</button>
-                    </td>
-                  </tr>
+                      <label>
+                        <span>Size</span>
+                        <input value={variant.size} onChange={(event) => handleVariantChange(index, 'size', event.target.value)} />
+                      </label>
+
+                      <label>
+                        <span>Color</span>
+                        <input value={variant.color} onChange={(event) => handleVariantChange(index, 'color', event.target.value)} />
+                      </label>
+
+                      <label>
+                        <span>Stock</span>
+                        <input type="number" value={variant.stock} onChange={(event) => handleVariantChange(index, 'stock', Number(event.target.value))} />
+                      </label>
+
+                      <label>
+                        <span>Price override</span>
+                        <input type="number" value={variant.priceOverride ?? 0} onChange={(event) => handleVariantChange(index, 'priceOverride', Number(event.target.value))} />
+                      </label>
+
+                      <label className="toggle-row compact-toggle">
+                        <span>Active</span>
+                        <input type="checkbox" checked={variant.isActive} onChange={(event) => handleVariantChange(index, 'isActive', event.target.checked)} />
+                      </label>
+                    </div>
+
+                    {form.variants.length > 1 ? (
+                      <button type="button" className="link-button danger" onClick={() => handleRemoveVariant(index)}>
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+
+              <div className="product-form-actions full-span">
+                <button type="button" className="secondary-button" onClick={() => setIsProductModalOpen(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="primary-button">
+                  {editingId ? 'Save changes' : 'Create product'}
+                </button>
+              </div>
+            </form>
           </div>
-        </section>
-      </div>
+        </div>
+      ) : null}
     </div>
   )
 }
-
 function CategoriesPage() {
   const [items, setItems] = useState<CategoryItem[]>(categorySeed)
 
@@ -992,17 +1460,12 @@ function OrdersPage() {
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order.id}>
+                <tr key={order.id} className="row-clickable" onClick={() => setSelectedOrder(order)}>
                   <td>{order.id}</td>
                   <td>{order.customer}</td>
                   <td>{formatMoney(order.total)}</td>
                   <td>
                     <span className={`status-pill ${getStatusTone(order.status)}`}>{order.status}</span>
-                  </td>
-                  <td className="actions-cell">
-                    <button type="button" className="link-button" onClick={() => setSelectedOrder(order)}>
-                      View details
-                    </button>
                   </td>
                 </tr>
               ))}

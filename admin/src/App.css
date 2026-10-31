@@ -2,7 +2,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
-  background: radial-gradient(circle at top, rgba(47, 143, 91, 0.12), transparent 35%), var(--page-bg);
+  background: var(--page-bg);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-soft);
   border-radius: 28px;
@@ -173,11 +173,11 @@
   justify-content: center;
   gap: 8px;
   padding: 10px 16px;
-  color: var(--sidebar-text);
-  background: linear-gradient(180deg, rgba(34,34,37,0.98), rgba(18,18,20,0.98));
+  color: #f8f8f8;
+  background: linear-gradient(180deg, #18181a, #0f0f10);
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
 .secondary-button {
@@ -187,7 +187,7 @@
   gap: 8px;
   padding: 10px 14px;
   color: var(--text-strong);
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0.96);
   border: 1px solid var(--border);
   border-radius: 10px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
@@ -211,6 +211,21 @@
   gap: 16px;
 }
 
+.page-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.row-clickable {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.row-clickable:hover {
+  background: rgba(255,255,255,0.03);
+}
 .dashboard-header {
   align-items: flex-end;
   margin-bottom: 4px;
@@ -710,7 +725,8 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid var(--border);
@@ -721,10 +737,131 @@ select {
   font: inherit;
 }
 
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   outline: 2px solid rgba(17, 17, 17, 0.08);
   border-color: rgba(17, 17, 17, 0.2);
+}
+
+.product-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.product-form-grid .full-span {
+  grid-column: 1 / -1;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.018);
+}
+
+.toggle-row input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #6fc98b;
+}
+
+.compact-toggle {
+  min-height: 48px;
+}
+
+.inventory-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.018);
+}
+
+.inventory-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inventory-editor-header h4 {
+  margin: 0;
+  color: var(--text-strong);
+  letter-spacing: -0.03em;
+}
+
+.variant-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+
+.variant-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.inventory-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+}
+
+.inventory-table {
+  width: 100%;
+  min-width: 420px;
+}
+
+.product-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.link-button.danger {
+  color: #f6a9a0;
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .inline-form {
@@ -827,10 +964,13 @@ select:focus {
   place-items: center;
   padding: 24px;
   z-index: 50;
+  overflow-y: auto;
 }
 
 .order-modal {
   width: min(760px, 100%);
+  max-height: min(86vh, 900px);
+  overflow: auto;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 24px;

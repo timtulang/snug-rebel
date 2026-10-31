@@ -13,15 +13,31 @@ export type SessionUser = {
   provider: 'email' | 'oauth'
 }
 
+export type ProductVariantItem = {
+  id: string
+  sku: string
+  size: string
+  color: string
+  stock: number
+  priceOverride?: number
+  isActive: boolean
+}
+
 export type ProductItem = {
   id: string
+  displayId: string
+  slug: string
   name: string
   category: string
+  categoryId?: string
+  description?: string
   price: number
+  material?: string
   stock: number
-  status: 'Active' | 'Low stock' | 'Draft'
+  isActive: boolean
+  status: 'Active' | 'Low stock' | 'Draft' | 'Inactive'
   sku: string
-  variants: number
+  variants: ProductVariantItem[]
 }
 
 export type CategoryItem = {

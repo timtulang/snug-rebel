@@ -50,7 +50,6 @@ public class DashboardController : ControllerBase
         var average = countsOnly.Any() ? (int)Math.Round(countsOnly.Average()) : 0;
         var maximum = countsOnly.Any() ? countsOnly.Max() : 0;
 
-        var maxOrders = countsOnly.Any() ? countsOnly.Max() : 1;
         var firstDayOfMonth = new DateTime(monthStart.Year, monthStart.Month, 1);
         var leadingDays = (int)firstDayOfMonth.DayOfWeek;
         var calendarStart = firstDayOfMonth.AddDays(-leadingDays);
@@ -61,12 +60,11 @@ public class DashboardController : ControllerBase
             {
                 var dateKey = day.Date.ToString("yyyy-MM-dd");
                 var entry = dailyCounts.FirstOrDefault(x => x.date.ToString("yyyy-MM-dd") == dateKey);
-                var value = entry == null ? 0d : Math.Max(0.12d, (double)entry.orders / Math.Max(maxOrders, 1));
 
                 return new
                 {
                     date = dateKey,
-                    value,
+                    value = entry == null ? 0d : Math.Max(0.12d, (double)entry.orders / Math.Max(maximum, 1)),
                     orders = entry?.orders ?? 0,
                     total = entry?.total ?? 0m,
                     isCurrentDay = day.Date == DateTime.UtcNow.Date,
@@ -160,24 +158,6 @@ public class DashboardController : ControllerBase
         }
 
         return Ok(new { items = notifications });
-    }
-
-    private async Task SeedAnalyticsAsync()
-    {
-        var rows = new[]
-        {
-            new DashboardMetric { MetricKey = "minimum_number", MetricLabel = "Minimum number", MetricValue = 0, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new DashboardMetric { MetricKey = "average_number", MetricLabel = "Average number", MetricValue = 0, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new DashboardMetric { MetricKey = "maximum_number", MetricLabel = "Maximum number", MetricValue = 0, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-        };
-
-        foreach (var row in rows)
-        {
-            row.PkDashboardMetricId = $"dmetric-{Guid.NewGuid():N}";
-        }
-
-        _context.DashboardMetrics.AddRange(rows);
-        await _context.SaveChangesAsync();
     }
 
     private async Task SeedNotificationRowsAsync()
