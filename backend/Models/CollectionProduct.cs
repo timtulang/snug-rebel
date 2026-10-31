@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -13,7 +14,9 @@ public partial class CollectionProduct
 
     public DateTime UpdatedAt { get; set; }
 
+    [JsonIgnore]
     public virtual Collection FkCollection { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual Product FkProduct { get; set; } = null!;
 }

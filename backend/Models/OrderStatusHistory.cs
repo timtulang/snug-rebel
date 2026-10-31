@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -15,7 +16,9 @@ public partial class OrderStatusHistory
 
     public DateTime ChangedAt { get; set; }
 
+    [JsonIgnore]
     public virtual User ChangedByNavigation { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual Order FkOrder { get; set; } = null!;
 }

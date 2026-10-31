@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -31,19 +32,27 @@ public partial class Order
 
     public DateTime UpdatedAt { get; set; }
 
+    [JsonIgnore]
     public virtual Address? FkBillingAddress { get; set; }
 
+    [JsonIgnore]
     public virtual PromoCode? FkPromoCode { get; set; }
 
+    [JsonIgnore]
     public virtual Address FkShippingAddress { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual User FkUser { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
+    [JsonIgnore]
     public virtual ICollection<OrderStatusHistory> OrderStatusHistories { get; set; } = new List<OrderStatusHistory>();
 
+    [JsonIgnore]
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
+    [JsonIgnore]
     public virtual ICollection<Shipment> Shipments { get; set; } = new List<Shipment>();
 }

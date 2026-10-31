@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -15,5 +16,6 @@ public partial class AuditLog
 
     public DateTime CreatedAt { get; set; }
 
+    [JsonIgnore]
     public virtual User FkUser { get; set; } = null!;
 }

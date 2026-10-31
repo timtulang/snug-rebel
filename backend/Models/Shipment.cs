@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -17,5 +18,6 @@ public partial class Shipment
 
     public DateTime? DeliveredAt { get; set; }
 
+    [JsonIgnore]
     public virtual Order FkOrder { get; set; } = null!;
 }

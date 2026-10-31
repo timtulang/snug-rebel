@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -19,7 +20,9 @@ public partial class ProductImage
 
     public bool IsPrimary { get; set; }
 
+    [JsonIgnore]
     public virtual Product FkProduct { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual ProductVariant? FkVariant { get; set; }
 }

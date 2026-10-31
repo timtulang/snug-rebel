@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -33,9 +34,12 @@ public partial class Address
 
     public DateTime UpdatedAt { get; set; }
 
+    [JsonIgnore]
     public virtual User? FkUser { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<Order> OrderFkBillingAddresses { get; set; } = new List<Order>();
 
+    [JsonIgnore]
     public virtual ICollection<Order> OrderFkShippingAddresses { get; set; } = new List<Order>();
 }

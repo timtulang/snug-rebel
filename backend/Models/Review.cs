@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -19,9 +20,12 @@ public partial class Review
 
     public DateTime CreatedAt { get; set; }
 
+    [JsonIgnore]
     public virtual OrderItem FkOrderItem { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual Product FkProduct { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual User FkUser { get; set; } = null!;
 }

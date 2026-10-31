@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -25,9 +26,12 @@ public partial class OrderItem
 
     public decimal LineTotal { get; set; }
 
+    [JsonIgnore]
     public virtual Order FkOrder { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual ProductVariant FkProductVariant { get; set; } = null!;
 
+    [JsonIgnore]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

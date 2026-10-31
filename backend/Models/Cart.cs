@@ -1,4 +1,6 @@
-﻿namespace backend.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace backend.Models;
 
 public partial class Cart
 {
@@ -11,7 +13,9 @@ public partial class Cart
 
     public DateTime UpdatedAt { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
+    [JsonIgnore]
     public virtual User? FkUser { get; set; }
 }

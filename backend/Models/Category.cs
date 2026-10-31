@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace backend.Models;
 
@@ -17,9 +18,12 @@ public partial class Category
 
     public bool IsActive { get; set; }
 
+    [JsonIgnore]
     public virtual Category? FkParentCategory { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<Category> InverseFkParentCategory { get; set; } = new List<Category>();
 
+    [JsonIgnore]
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }
